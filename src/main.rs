@@ -7,7 +7,7 @@ use diesel::prelude::*;
 use diesel::{delete, update};
 use rocket::fs::NamedFile;
 use rocket::response::{status::Created, Debug};
-use rocket::serde::{json::Json, Deserialize, Serialize};
+use rocket::serde::{json::Json, json::serde_json::json, Deserialize, Serialize};
 use rocket_dyn_templates::Template;
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -82,8 +82,23 @@ async fn delete_data(conn: LibraryDbConn, uid: i32) -> Result<Option<()>> {
 
 #[get("/")]
 fn index() -> Template {
-    let context: HashMap<u32, u32> = HashMap::new();
-    Template::render("index", &context)
+   // let context: HashMap<u32, u32> = HashMap::new();
+    let test_1 : UserEntity = UserEntity {
+        id : 1,
+        name : "Ivan".to_string(),
+        email : "funny@gmail.com".to_string(),
+        age : 42
+    };
+    let test_2 : UserEntity = UserEntity {
+        id : 2,
+        name : "Vanya".to_string(),
+        email : "sad@gmail.com".to_string(),
+        age : 24
+    };
+    
+    let mut context : HashMap<String, Vec<UserEntity>> = HashMap::new();
+    context.insert("users".to_string(), vec![test_1, test_2]); 
+    Template::render("index", context)
 }
 
 #[get("/login")]
