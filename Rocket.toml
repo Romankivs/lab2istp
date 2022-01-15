@@ -1,0 +1,2 @@
+[global.databases]
+pg_library = { url = "postgres://postgres:summer@localhost/diesel_demo" }
