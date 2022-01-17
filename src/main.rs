@@ -2,12 +2,14 @@
 extern crate rocket;
 #[macro_use]
 extern crate diesel;
-use diesel::insert_into;
-use diesel::prelude::*;
-use diesel::{delete, update};
+use diesel::{delete, insert_into, prelude::*, update};
+use rocket::form::Form;
 use rocket::fs::NamedFile;
-use rocket::response::{status::Created, Debug};
-use rocket::serde::{json::Json, json::serde_json::json, Deserialize, Serialize};
+use rocket::http::{Cookie, CookieJar, Status};
+use rocket::outcome::{IntoOutcome, Outcome};
+use rocket::request::{self, FlashMessage, FromRequest, Request};
+use rocket::response::{status::Created, Debug, Flash, Redirect};
+use rocket::serde::{json::Json, Deserialize, Serialize};
 use rocket_dyn_templates::Template;
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -36,10 +38,66 @@ struct User {
     age: i32,
 }
 
+#[derive(FromForm)]
+struct Login<'a> {
+    email: &'a str,
+    password: &'a str,
+}
+
+struct AuthUser(i32);
+
+#[derive(Debug)]
+enum LoginError {
+    InvalidData,
+    EmailDoesntExist,
+    WrongPassword,
+}
+
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for AuthUser {
+    type Error = LoginError;
+
+    async fn from_request(request: &'r Request<'_>) -> request::Outcome<AuthUser, Self::Error> {
+        let email_ = request.cookies().get_private("user_email");
+        let password = request.cookies().get_private("user_password");
+        match (email_, password) {
+            (Some(e), Some(p)) => {
+                let e = e.clone();
+                let p = p.clone();
+                let conn = LibraryDbConn::get_one(request.rocket())
+                    .await
+                    .expect("Couldn`t get DB connection");
+                use schema::users::dsl::*;
+                let user_password = conn
+                    .run(move |c| {
+                        users
+                            .select(email)
+                            .filter(name.eq(e.value()))
+                            .get_result::<String>(c)
+                    })
+                    .await;
+                match user_password {
+                    Ok(pwd) => {
+                        if pwd == p.value() {
+                            Outcome::Success(AuthUser(1))
+                        } else {
+                            Outcome::Failure((Status::Unauthorized, LoginError::WrongPassword))
+                        }
+                    }
+                    Err(_) => {
+                        Outcome::Failure((Status::Unauthorized, LoginError::EmailDoesntExist))
+                    }
+                }
+            }
+            _ => Outcome::Failure((Status::Unauthorized, LoginError::InvalidData)),
+        }
+    }
+}
+
 type Result<T, E = Debug<diesel::result::Error>> = std::result::Result<T, E>;
 
 #[get("/data/<uid>")]
-async fn data(conn: LibraryDbConn, uid: i32) -> Option<Json<UserEntity>> {
+async fn data(conn: LibraryDbConn, uid: i32, _user: AuthUser) -> Option<Json<UserEntity>> {
     use schema::users::dsl::*;
     conn.run(move |c| users.filter(id.eq(uid)).first(c))
         .await
@@ -82,29 +140,57 @@ async fn delete_data(conn: LibraryDbConn, uid: i32) -> Result<Option<()>> {
 
 #[get("/")]
 fn index() -> Template {
-   // let context: HashMap<u32, u32> = HashMap::new();
-    let test_1 : UserEntity = UserEntity {
-        id : 1,
-        name : "Ivan".to_string(),
-        email : "funny@gmail.com".to_string(),
-        age : 42
+    let test_1: UserEntity = UserEntity {
+        id: 1,
+        name: "Ivan".to_string(),
+        email: "funny@gmail.com".to_string(),
+        age: 42,
     };
-    let test_2 : UserEntity = UserEntity {
-        id : 2,
-        name : "Vanya".to_string(),
-        email : "sad@gmail.com".to_string(),
-        age : 24
+    let test_2: UserEntity = UserEntity {
+        id: 2,
+        name: "Vanya".to_string(),
+        email: "sad@gmail.com".to_string(),
+        age: 24,
     };
-    
-    let mut context : HashMap<String, Vec<UserEntity>> = HashMap::new();
-    context.insert("users".to_string(), vec![test_1, test_2]); 
+
+    let mut context: HashMap<String, Vec<UserEntity>> = HashMap::new();
+    context.insert("users".to_string(), vec![test_1, test_2]);
     Template::render("index", context)
 }
 
 #[get("/login")]
-fn login() -> Template {
-    let context: HashMap<u32, u32> = HashMap::new();
-    Template::render("login", &context)
+fn login(flash: Option<FlashMessage<'_>>) -> Template {
+    Template::render("login", &flash)
+}
+
+#[post("/login", data = "<login>")]
+async fn post_login(
+    conn: LibraryDbConn,
+    jar: &CookieJar<'_>,
+    login: Form<Login<'_>>,
+) -> Result<Redirect, Flash<Redirect>> {
+    use schema::users::dsl::*;
+    let email_clone = login.email.to_string();
+    let user_password = conn
+        .run(|c| {
+            users
+                .select(email)
+                .filter(name.eq(email_clone))
+                .get_result::<String>(c)
+        })
+        .await;
+    match user_password {
+        Ok(pwd) => {
+            if pwd == login.password {
+                jar.add_private(Cookie::new("user_email", login.email.to_string()));
+                jar.add_private(Cookie::new("user_password", pwd));
+                Ok(Redirect::to(uri!(index)))
+            } else {
+                Err(Flash::error(Redirect::to(uri!(login)), "Wrong password"))
+            }
+        }
+        Err(_) => Err(Flash::error(Redirect::to(uri!(login)), "Email not found."))
+    }
 }
 
 #[get("/public/<file..>")]
@@ -122,6 +208,7 @@ fn rocket() -> _ {
             routes![
                 index,
                 login,
+                post_login,
                 public_file,
                 data,
                 new_data,
