@@ -19,6 +19,7 @@
         <th scope="col">Name</th>
         <th scope="col">Email</th>
         <th scope="col">Age</th>
+        <th scope="col">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -28,6 +29,11 @@
                 <td>{{name}}</td>
                 <td>{{email}}</td>
                 <td>{{age}}</td>
+                <td>
+                    <a href="/data/{{id}}" title="Show Info">Info</a> | 
+                    <a href="#" title="Edit">Edit</a> | 
+                    <a href="#" title="Delete">Delete</a>
+                </td>
             </tr>
         {{/each}}
     </tbody>

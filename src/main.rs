@@ -5,94 +5,20 @@ extern crate diesel;
 use diesel::{delete, insert_into, prelude::*, update};
 use rocket::form::Form;
 use rocket::fs::NamedFile;
-use rocket::http::{Cookie, CookieJar, Status};
-use rocket::outcome::{IntoOutcome, Outcome};
-use rocket::request::{self, FlashMessage, FromRequest, Request};
+use rocket::http::{Cookie, CookieJar};
+use rocket::request::FlashMessage;
 use rocket::response::{status::Created, Debug, Flash, Redirect};
-use rocket::serde::{json::Json, Deserialize, Serialize};
+use rocket::serde::json::Json;
 use rocket_dyn_templates::Template;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-use rocket_sync_db_pools::database;
-
-#[database("pg_library")]
-struct LibraryDbConn(diesel::PgConnection);
-
 mod schema;
-use schema::users;
+mod models;
+use models::*;
+mod auth;
+use auth::*;
 
-#[derive(Queryable, Serialize)]
-struct UserEntity {
-    id: i32,
-    name: String,
-    email: String,
-    age: i32,
-}
-
-#[derive(Insertable, Serialize, Deserialize, AsChangeset)]
-#[table_name = "users"]
-struct User {
-    name: String,
-    email: String,
-    age: i32,
-}
-
-#[derive(FromForm)]
-struct Login<'a> {
-    email: &'a str,
-    password: &'a str,
-}
-
-struct AuthUser(i32);
-
-#[derive(Debug)]
-enum LoginError {
-    InvalidData,
-    EmailDoesntExist,
-    WrongPassword,
-}
-
-#[rocket::async_trait]
-impl<'r> FromRequest<'r> for AuthUser {
-    type Error = LoginError;
-
-    async fn from_request(request: &'r Request<'_>) -> request::Outcome<AuthUser, Self::Error> {
-        let email_ = request.cookies().get_private("user_email");
-        let password = request.cookies().get_private("user_password");
-        match (email_, password) {
-            (Some(e), Some(p)) => {
-                let e = e.clone();
-                let p = p.clone();
-                let conn = LibraryDbConn::get_one(request.rocket())
-                    .await
-                    .expect("Couldn`t get DB connection");
-                use schema::users::dsl::*;
-                let user_password = conn
-                    .run(move |c| {
-                        users
-                            .select(email)
-                            .filter(name.eq(e.value()))
-                            .get_result::<String>(c)
-                    })
-                    .await;
-                match user_password {
-                    Ok(pwd) => {
-                        if pwd == p.value() {
-                            Outcome::Success(AuthUser(1))
-                        } else {
-                            Outcome::Failure((Status::Unauthorized, LoginError::WrongPassword))
-                        }
-                    }
-                    Err(_) => {
-                        Outcome::Failure((Status::Unauthorized, LoginError::EmailDoesntExist))
-                    }
-                }
-            }
-            _ => Outcome::Failure((Status::Unauthorized, LoginError::InvalidData)),
-        }
-    }
-}
 
 type Result<T, E = Debug<diesel::result::Error>> = std::result::Result<T, E>;
 
@@ -139,23 +65,12 @@ async fn delete_data(conn: LibraryDbConn, uid: i32) -> Result<Option<()>> {
 }
 
 #[get("/")]
-fn index() -> Template {
-    let test_1: UserEntity = UserEntity {
-        id: 1,
-        name: "Ivan".to_string(),
-        email: "funny@gmail.com".to_string(),
-        age: 42,
-    };
-    let test_2: UserEntity = UserEntity {
-        id: 2,
-        name: "Vanya".to_string(),
-        email: "sad@gmail.com".to_string(),
-        age: 24,
-    };
-
-    let mut context: HashMap<String, Vec<UserEntity>> = HashMap::new();
-    context.insert("users".to_string(), vec![test_1, test_2]);
-    Template::render("index", context)
+async fn index(conn: LibraryDbConn) -> Result<Template> {
+    use schema::users::dsl::*;
+    let all_users = conn.run(|c| users.load::<UserEntity>(c)).await?;
+    let mut context: HashMap<&str, Vec<UserEntity>> = HashMap::new();
+    context.insert("users", all_users);
+    Ok(Template::render("index", context))
 }
 
 #[get("/login")]
@@ -189,7 +104,7 @@ async fn post_login(
                 Err(Flash::error(Redirect::to(uri!(login)), "Wrong password"))
             }
         }
-        Err(_) => Err(Flash::error(Redirect::to(uri!(login)), "Email not found."))
+        Err(_) => Err(Flash::error(Redirect::to(uri!(login)), "Email not found.")),
     }
 }
 
