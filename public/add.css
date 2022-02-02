@@ -1,0 +1,13 @@
+html,
+body {
+  height: 100%;
+}
+
+.form-add {
+  width: 100%;
+  align-items: center;
+  max-width: 330px;
+  padding-top: 20px;
+  padding-bottom: 40px;
+  margin: auto;
+}

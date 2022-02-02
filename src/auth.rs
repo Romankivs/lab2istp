@@ -4,14 +4,13 @@ use rocket::outcome::Outcome;
 use rocket::http::Status;
 
 use super::models::LibraryDbConn;
+use super::models::StaffEntity;
 
 #[derive(FromForm)]
 pub struct Login<'a> {
     pub email: &'a str,
     pub password: &'a str,
 }
-
-pub struct AuthUser(i32);
 
 #[derive(Debug)]
 pub enum LoginError {
@@ -21,10 +20,10 @@ pub enum LoginError {
 }
 
 #[rocket::async_trait]
-impl<'r> FromRequest<'r> for AuthUser {
+impl<'r> FromRequest<'r> for StaffEntity {
     type Error = LoginError;
 
-    async fn from_request(request: &'r Request<'_>) -> request::Outcome<AuthUser, Self::Error> {
+    async fn from_request(request: &'r Request<'_>) -> request::Outcome<StaffEntity, Self::Error> {
         let email_ = request.cookies().get_private("user_email");
         let password = request.cookies().get_private("user_password");
         match (email_, password) {
@@ -34,19 +33,18 @@ impl<'r> FromRequest<'r> for AuthUser {
                 let conn = LibraryDbConn::get_one(request.rocket())
                     .await
                     .expect("Couldn`t get DB connection");
-                use super::schema::users::dsl::*;
-                let user_password = conn
+                use super::schema::staff::dsl::*;
+                let staff_user = conn
                     .run(move |c| {
-                        users
-                            .select(email)
-                            .filter(name.eq(e.value()))
-                            .get_result::<String>(c)
+                        staff
+                            .filter(email.eq(e.value()))
+                            .get_result::<StaffEntity>(c)
                     })
                     .await;
-                match user_password {
-                    Ok(pwd) => {
-                        if pwd == p.value() {
-                            Outcome::Success(AuthUser(1))
+                match staff_user {
+                    Ok(user) => {
+                        if user.password == p.value() {
+                            Outcome::Success(user)
                         } else {
                             Outcome::Failure((Status::Unauthorized, LoginError::WrongPassword))
                         }

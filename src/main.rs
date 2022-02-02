@@ -7,7 +7,7 @@ use rocket::form::Form;
 use rocket::fs::NamedFile;
 use rocket::http::{Cookie, CookieJar};
 use rocket::request::FlashMessage;
-use rocket::response::{status::Created, Debug, Flash, Redirect};
+use rocket::response::{Debug, Flash, Redirect};
 use rocket::serde::json::Json;
 use rocket_dyn_templates::Template;
 use std::collections::HashMap;
@@ -19,56 +19,67 @@ use models::*;
 mod auth;
 use auth::*;
 
-
 type Result<T, E = Debug<diesel::result::Error>> = std::result::Result<T, E>;
 
 #[get("/data/<uid>")]
-async fn data(conn: LibraryDbConn, uid: i32, _user: AuthUser) -> Option<Json<UserEntity>> {
-    use schema::users::dsl::*;
-    conn.run(move |c| users.filter(id.eq(uid)).first(c))
-        .await
-        .map(Json)
-        .ok()
-}
-
-#[post("/data", format = "json", data = "<new_user>")]
-async fn new_data(conn: LibraryDbConn, new_user: Json<User>) -> Result<Created<Json<UserEntity>>> {
-    use schema::users::dsl::*;
-    let insert_res: UserEntity = conn
-        .run(move |c| insert_into(users).values(&*new_user).get_result(c))
+async fn data(conn: LibraryDbConn, uid: i32) -> Result<Template> {
+    use schema::staff::dsl::*;
+    let data : StaffEntity = conn.run(move |c| staff.filter(staff_id.eq(uid)).first(c))
         .await?;
-    Ok(Created::new("/data").body(Json(insert_res)))
+    Ok(Template::render("show", data))
 }
 
-#[put("/data/<uid>", format = "json", data = "<updated_user>")]
+#[post("/data", data = "<new_staff>")]
+async fn new_data(conn: LibraryDbConn, new_staff: Form<Staff>) -> Result<Redirect> {
+    use schema::staff::dsl::*;
+    conn
+        .run(move |c| insert_into(staff).values(&*new_staff).execute(c))
+        .await?;
+    Ok(Redirect::to(uri!(index)))
+}
+
+#[put("/data/<uid>", data = "<updated_user>")]
 async fn update_data(
     conn: LibraryDbConn,
     uid: i32,
-    updated_user: Json<User>,
-) -> Option<Json<UserEntity>> {
-    use schema::users::dsl::*;
-    let target = update(users).filter(id.eq(uid));
-    conn.run(move |c| target.set(&*updated_user).get_result(c))
-        .await
-        .map(Json)
-        .ok()
+    updated_user: Form<Staff>,
+) -> Result<Redirect> {
+    use schema::staff::dsl::*;
+    let target = update(staff).filter(staff_id.eq(uid));
+    conn.run(move |c| target.set(&*updated_user).execute(c))
+        .await?;
+    Ok(Redirect::to(uri!(index)))
 }
 
 #[delete("/data/<uid>")]
-async fn delete_data(conn: LibraryDbConn, uid: i32) -> Result<Option<()>> {
-    use schema::users::dsl::*;
-    let affected_rows = conn
-        .run(move |c| delete(users).filter(id.eq(uid)).execute(c))
+async fn delete_data(conn: LibraryDbConn, uid: i32) -> Result<Redirect> {
+    use schema::staff::dsl::*;
+    conn
+        .run(move |c| delete(staff).filter(staff_id.eq(uid)).execute(c))
         .await?;
 
-    Ok((affected_rows == 1).then(|| ()))
+    Ok(Redirect::to(uri!(index)))
 }
+
+#[get("/data/add")]
+fn add_staff() -> Template {
+    Template::render("add", HashMap::<i32, i32>::new())
+}
+
+#[get("/data/update/<uid>")]
+async fn update_staff(conn: LibraryDbConn, uid: i32) -> Result<Template> {
+    use schema::staff::dsl::*;
+    let data : StaffEntity = conn.run(move |c| staff.filter(staff_id.eq(uid)).first(c))
+        .await?;
+    Ok(Template::render("update", data))
+}
+
 
 #[get("/")]
 async fn index(conn: LibraryDbConn) -> Result<Template> {
-    use schema::users::dsl::*;
-    let all_users = conn.run(|c| users.load::<UserEntity>(c)).await?;
-    let mut context: HashMap<&str, Vec<UserEntity>> = HashMap::new();
+    use schema::staff::dsl::*;
+    let all_users = conn.run(|c| staff.load::<StaffEntity>(c)).await?;
+    let mut context: HashMap<&str, Vec<StaffEntity>> = HashMap::new();
     context.insert("users", all_users);
     Ok(Template::render("index", context))
 }
@@ -84,17 +95,17 @@ async fn post_login(
     jar: &CookieJar<'_>,
     login: Form<Login<'_>>,
 ) -> Result<Redirect, Flash<Redirect>> {
-    use schema::users::dsl::*;
+    use schema::staff::dsl::*;
     let email_clone = login.email.to_string();
-    let user_password = conn
+    let staff_password = conn
         .run(|c| {
-            users
-                .select(email)
-                .filter(name.eq(email_clone))
+            staff
+                .select(password)
+                .filter(email.eq(email_clone))
                 .get_result::<String>(c)
         })
         .await;
-    match user_password {
+    match staff_password {
         Ok(pwd) => {
             if pwd == login.password {
                 jar.add_private(Cookie::new("user_email", login.email.to_string()));
@@ -128,7 +139,9 @@ fn rocket() -> _ {
                 data,
                 new_data,
                 update_data,
-                delete_data
+                delete_data,
+                add_staff,
+                update_staff
             ],
         )
         .attach(Template::fairing())
