@@ -1,2 +1,5 @@
 [global.databases]
 pg_library = { url = "postgres://postgres:summer@localhost/diesel_demo" }
+
+[default]
+secret_key = "zGfjrPuvZWANpuWITdxYSUWVIPqSJc/bkZcZN3AgfH8="

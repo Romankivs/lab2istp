@@ -1,7 +1,7 @@
 use diesel::prelude::*;
-use rocket::request::{self, FromRequest, Request};
-use rocket::outcome::Outcome;
 use rocket::http::Status;
+use rocket::outcome::Outcome;
+use rocket::request::{self, FromRequest, Request};
 
 use super::models::LibraryDbConn;
 use super::models::StaffEntity;

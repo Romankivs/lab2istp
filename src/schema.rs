@@ -4,13 +4,7 @@ table! {
         car_model_id -> Int4,
         available -> Bool,
         condition -> Text,
-        price_per_day -> Numeric,
-        engine_horsepower -> Int4,
-        fuel_type -> Text,
-        body_type -> Text,
-        number_of_seats -> Int4,
-        color -> Text,
-        interiors_color -> Text,
+        price_per_day -> Float4,
     }
 }
 
@@ -72,11 +66,4 @@ joinable!(rented_car -> car (plate_number));
 joinable!(rented_car -> customer (customer_id));
 joinable!(rented_car -> staff (staff_id));
 
-allow_tables_to_appear_in_same_query!(
-    car,
-    car_model,
-    customer,
-    manufacturer,
-    rented_car,
-    staff,
-);
+allow_tables_to_appear_in_same_query!(car, car_model, customer, manufacturer, rented_car, staff,);

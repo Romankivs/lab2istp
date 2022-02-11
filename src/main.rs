@@ -8,23 +8,25 @@ use rocket::fs::NamedFile;
 use rocket::http::{Cookie, CookieJar};
 use rocket::request::FlashMessage;
 use rocket::response::{Debug, Flash, Redirect};
-use rocket::serde::json::Json;
 use rocket_dyn_templates::Template;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-mod schema;
 mod models;
+mod schema;
 use models::*;
 mod auth;
 use auth::*;
+mod car_model;
+mod manufacturer;
 
 type Result<T, E = Debug<diesel::result::Error>> = std::result::Result<T, E>;
 
 #[get("/data/<uid>")]
 async fn data(conn: LibraryDbConn, uid: i32) -> Result<Template> {
     use schema::staff::dsl::*;
-    let data : StaffEntity = conn.run(move |c| staff.filter(staff_id.eq(uid)).first(c))
+    let data: StaffEntity = conn
+        .run(move |c| staff.filter(staff_id.eq(uid)).first(c))
         .await?;
     Ok(Template::render("show", data))
 }
@@ -32,18 +34,13 @@ async fn data(conn: LibraryDbConn, uid: i32) -> Result<Template> {
 #[post("/data", data = "<new_staff>")]
 async fn new_data(conn: LibraryDbConn, new_staff: Form<Staff>) -> Result<Redirect> {
     use schema::staff::dsl::*;
-    conn
-        .run(move |c| insert_into(staff).values(&*new_staff).execute(c))
+    conn.run(move |c| insert_into(staff).values(&*new_staff).execute(c))
         .await?;
     Ok(Redirect::to(uri!(index)))
 }
 
 #[put("/data/<uid>", data = "<updated_user>")]
-async fn update_data(
-    conn: LibraryDbConn,
-    uid: i32,
-    updated_user: Form<Staff>,
-) -> Result<Redirect> {
+async fn update_data(conn: LibraryDbConn, uid: i32, updated_user: Form<Staff>) -> Result<Redirect> {
     use schema::staff::dsl::*;
     let target = update(staff).filter(staff_id.eq(uid));
     conn.run(move |c| target.set(&*updated_user).execute(c))
@@ -54,8 +51,7 @@ async fn update_data(
 #[delete("/data/<uid>")]
 async fn delete_data(conn: LibraryDbConn, uid: i32) -> Result<Redirect> {
     use schema::staff::dsl::*;
-    conn
-        .run(move |c| delete(staff).filter(staff_id.eq(uid)).execute(c))
+    conn.run(move |c| delete(staff).filter(staff_id.eq(uid)).execute(c))
         .await?;
 
     Ok(Redirect::to(uri!(index)))
@@ -69,11 +65,11 @@ fn add_staff() -> Template {
 #[get("/data/update/<uid>")]
 async fn update_staff(conn: LibraryDbConn, uid: i32) -> Result<Template> {
     use schema::staff::dsl::*;
-    let data : StaffEntity = conn.run(move |c| staff.filter(staff_id.eq(uid)).first(c))
+    let data: StaffEntity = conn
+        .run(move |c| staff.filter(staff_id.eq(uid)).first(c))
         .await?;
     Ok(Template::render("update", data))
 }
-
 
 #[get("/")]
 async fn index(conn: LibraryDbConn) -> Result<Template> {
@@ -141,7 +137,21 @@ fn rocket() -> _ {
                 update_data,
                 delete_data,
                 add_staff,
-                update_staff
+                update_staff,
+                manufacturer::man_list,
+                manufacturer::man_add_menu,
+                manufacturer::man_update_menu,
+                manufacturer::man_show,
+                manufacturer::man_new,
+                manufacturer::man_update,
+                manufacturer::man_delete,
+                car_model::car_mod_list,
+                car_model::car_mod_add_menu,
+                car_model::car_mod_update_menu,
+                car_model::car_mod_show,
+                car_model::car_mod_new,
+                car_model::car_mod_update,
+                car_model::car_mod_delete
             ],
         )
         .attach(Template::fairing())

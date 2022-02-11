@@ -1,5 +1,5 @@
 CREATE TABLE customer (
-	driver_license_id serial PRIMARY KEY ,
+	driver_license_id serial PRIMARY KEY,
 	first_name TEXT NOT NULL,
 	last_name TEXT NOT NULL,
 	birth_date DATE NOT NULL,
@@ -26,16 +26,8 @@ CREATE TABLE car (
 	car_model_id integer NOT NULL,
 	available bool NOT NULL,
 	condition TEXT NOT NULL,
-	price_per_day DECIMAL NOT NULL,
-	engine_horsepower integer NOT NULL,
-	fuel_type TEXT NOT NULL,
-	body_type TEXT NOT NULL,
-	number_of_seats integer NOT NULL,
-	color TEXT NOT NULL,
-	interiors_color TEXT NOT NULL
+	price_per_day FLOAT4 NOT NULL
 );
-
-
 
 CREATE TABLE rented_car (
 	rented_car_id serial PRIMARY KEY,
@@ -47,8 +39,6 @@ CREATE TABLE rented_car (
 	returned bool NOT NULL,
 	comment TEXT NOT NULL
 );
-
-
 
 CREATE TABLE staff (
 	staff_id serial PRIMARY KEY,
@@ -63,9 +53,6 @@ ALTER TABLE car ADD CONSTRAINT car_fk0 FOREIGN KEY (car_model_id) REFERENCES car
 ALTER TABLE rented_car ADD CONSTRAINT rented_car_fk0 FOREIGN KEY (staff_id) REFERENCES staff(staff_id);
 ALTER TABLE rented_car ADD CONSTRAINT rented_car_fk1 FOREIGN KEY (plate_number) REFERENCES car(plate_number);
 ALTER TABLE rented_car ADD CONSTRAINT rented_car_fk2 FOREIGN KEY (customer_id) REFERENCES customer(driver_license_id);
-
-
-
 
 
 
