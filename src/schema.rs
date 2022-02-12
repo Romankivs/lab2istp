@@ -66,11 +66,4 @@ joinable!(rented_car -> car (plate_number));
 joinable!(rented_car -> customer (customer_id));
 joinable!(rented_car -> staff (staff_id));
 
-allow_tables_to_appear_in_same_query!(
-    car,
-    car_model,
-    customer,
-    manufacturer,
-    rented_car,
-    staff,
-);
+allow_tables_to_appear_in_same_query!(car, car_model, customer, manufacturer, rented_car, staff,);

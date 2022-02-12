@@ -17,9 +17,9 @@ mod schema;
 use models::*;
 mod auth;
 use auth::*;
+mod car;
 mod car_model;
 mod manufacturer;
-mod car;
 
 type Result<T, E = Debug<diesel::result::Error>> = std::result::Result<T, E>;
 

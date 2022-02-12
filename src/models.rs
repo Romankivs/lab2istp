@@ -1,6 +1,6 @@
+use bigdecimal::BigDecimal;
 use rocket::serde::{Deserialize, Serialize};
 use rocket_sync_db_pools::database;
-use bigdecimal::BigDecimal;
 
 #[database("pg_library")]
 pub struct LibraryDbConn(diesel::PgConnection);

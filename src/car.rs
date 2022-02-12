@@ -1,5 +1,5 @@
-use bigdecimal::{BigDecimal, FromPrimitive};
 use super::*;
+use bigdecimal::{BigDecimal, FromPrimitive};
 use serde_json::json;
 
 #[get("/car/<uid>")]
@@ -21,13 +21,15 @@ pub async fn car_new(
     _user: StaffEntity,
 ) -> Result<Redirect> {
     use schema::car::dsl::*;
-    let conv_bigdecimal: BigDecimal = BigDecimal::from_f32(new.price_per_day).expect("Conversion failed").with_scale(2);
+    let conv_bigdecimal: BigDecimal = BigDecimal::from_f32(new.price_per_day)
+        .expect("Conversion failed")
+        .with_scale(2);
     let converted = CarEntity {
         plate_number: new.plate_number.clone(),
         car_model_id: new.car_model_id,
         available: new.available,
         condition: new.condition.clone(),
-        price_per_day: conv_bigdecimal
+        price_per_day: conv_bigdecimal,
     };
     conn.run(move |c| insert_into(car).values(converted).execute(c))
         .await?;
@@ -43,12 +45,14 @@ pub async fn car_update(
 ) -> Result<Redirect> {
     use schema::car::dsl::*;
     let target = update(car).filter(plate_number.eq(uid));
-    let conv_bigdecimal: BigDecimal = BigDecimal::from_f32(updated.price_per_day).expect("Conversion failed").with_scale(2);
+    let conv_bigdecimal: BigDecimal = BigDecimal::from_f32(updated.price_per_day)
+        .expect("Conversion failed")
+        .with_scale(2);
     let converted = Car {
         car_model_id: updated.car_model_id,
         available: updated.available,
         condition: updated.condition.clone(),
-        price_per_day: conv_bigdecimal
+        price_per_day: conv_bigdecimal,
     };
     conn.run(move |c| target.set(converted).execute(c)).await?;
     Ok(Redirect::to(uri!(car_list)))
@@ -66,9 +70,7 @@ pub async fn car_delete(conn: LibraryDbConn, uid: String, _user: StaffEntity) ->
 #[get("/car/add")]
 pub async fn car_add_menu(conn: LibraryDbConn, user: StaffEntity) -> Result<Template> {
     use schema::car_model::dsl::*;
-    let car_models = conn
-        .run(|c| car_model.load::<CarModelEntity>(c))
-        .await?;
+    let car_models = conn.run(|c| car_model.load::<CarModelEntity>(c)).await?;
     Ok(Template::render(
         "car/add",
         json!({"car_models": car_models, "user": user}),
@@ -86,9 +88,7 @@ pub async fn car_update_menu(
         .run(move |c| car.filter(plate_number.eq(uid)).first(c))
         .await?;
     use schema::car_model::dsl::*;
-    let car_models = conn
-        .run(|c| car_model.load::<CarModelEntity>(c))
-        .await?;
+    let car_models = conn.run(|c| car_model.load::<CarModelEntity>(c)).await?;
     Ok(Template::render(
         "car/update",
         json!({"data": data,
