@@ -22,7 +22,7 @@ CREATE TABLE manufacturer (
 );
 
 CREATE TABLE car (
-	plate_number integer PRIMARY KEY,
+	plate_number TEXT PRIMARY KEY,
 	car_model_id integer NOT NULL,
 	available bool NOT NULL,
 	condition TEXT NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE car (
 CREATE TABLE rented_car (
 	rented_car_id serial PRIMARY KEY,
 	staff_id integer NOT NULL,
-	plate_number integer NOT NULL,
+	plate_number TEXT NOT NULL,
 	customer_id integer NOT NULL,
 	rent_date DATE NOT NULL,
 	return_date DATE NOT NULL,

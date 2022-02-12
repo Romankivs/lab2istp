@@ -1,5 +1,6 @@
 use rocket::serde::{Deserialize, Serialize};
 use rocket_sync_db_pools::database;
+use bigdecimal::BigDecimal;
 
 #[database("pg_library")]
 pub struct LibraryDbConn(diesel::PgConnection);
@@ -56,18 +57,36 @@ pub struct CarModel {
     pub release_year: i32,
 }
 
-#[derive(Queryable, Serialize)]
+#[derive(Queryable, Serialize, Insertable)]
+#[table_name = "car"]
 pub struct CarEntity {
-    pub plate_number: i32,
+    pub plate_number: String,
+    pub car_model_id: i32,
+    pub available: bool,
+    pub condition: String,
+    pub price_per_day: BigDecimal,
+}
+
+#[derive(FromForm)]
+pub struct CarEntityForm {
+    pub plate_number: String,
     pub car_model_id: i32,
     pub available: bool,
     pub condition: String,
     pub price_per_day: f32,
 }
 
-#[derive(Insertable, Serialize, Deserialize, AsChangeset, FromForm)]
+#[derive(Insertable, Serialize, Deserialize, AsChangeset)]
 #[table_name = "car"]
 pub struct Car {
+    pub car_model_id: i32,
+    pub available: bool,
+    pub condition: String,
+    pub price_per_day: BigDecimal,
+}
+
+#[derive(FromForm)]
+pub struct CarForm {
     pub car_model_id: i32,
     pub available: bool,
     pub condition: String,

@@ -19,6 +19,7 @@ mod auth;
 use auth::*;
 mod car_model;
 mod manufacturer;
+mod car;
 
 type Result<T, E = Debug<diesel::result::Error>> = std::result::Result<T, E>;
 
@@ -151,7 +152,14 @@ fn rocket() -> _ {
                 car_model::car_mod_show,
                 car_model::car_mod_new,
                 car_model::car_mod_update,
-                car_model::car_mod_delete
+                car_model::car_mod_delete,
+                car::car_list,
+                car::car_add_menu,
+                car::car_update_menu,
+                car::car_show,
+                car::car_new,
+                car::car_update,
+                car::car_delete
             ],
         )
         .attach(Template::fairing())

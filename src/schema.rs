@@ -1,10 +1,10 @@
 table! {
     car (plate_number) {
-        plate_number -> Int4,
+        plate_number -> Text,
         car_model_id -> Int4,
         available -> Bool,
         condition -> Text,
-        price_per_day -> Float4,
+        price_per_day -> Numeric,
     }
 }
 
@@ -41,7 +41,7 @@ table! {
     rented_car (rented_car_id) {
         rented_car_id -> Int4,
         staff_id -> Int4,
-        plate_number -> Int4,
+        plate_number -> Text,
         customer_id -> Int4,
         rent_date -> Date,
         return_date -> Date,
@@ -66,4 +66,11 @@ joinable!(rented_car -> car (plate_number));
 joinable!(rented_car -> customer (customer_id));
 joinable!(rented_car -> staff (staff_id));
 
-allow_tables_to_appear_in_same_query!(car, car_model, customer, manufacturer, rented_car, staff,);
+allow_tables_to_appear_in_same_query!(
+    car,
+    car_model,
+    customer,
+    manufacturer,
+    rented_car,
+    staff,
+);

@@ -14,31 +14,31 @@
   <body>
     {{> nav user}}
     {{#with data}}
-    <form action="/car_model/{{car_model_id}}" method="post" class="form-add">
+    <form action="/car/{{plate_number}}" method="post" class="form-add">
         <input type="hidden" name="_method" value="PUT">
         <div class="m-3">
-        <label for="Input0" class="form-label d-flex justify-content-center">ID</label>
-        <input type="id" class="form-control form-control-lg" name="id" value="{{car_model_id}}">
-        </div>
-        <div class="m-3">
-        <label for="Input1" class="form-label d-flex justify-content-center">Model Name</label>
-        <input type="model_name" class="form-control form-control-lg" name="model_name" value="{{model_name}}">
-        </div>
-        <div class="m-3">
-        <label for="Input2" class="form-label d-flex justify-content-center">Manufacturer</label>
-        <select type="manufacturer_id" name="manufacturer_id" class="form-select form-select-lg" aria-label="Select Manufacturer">
+        <label for="Input2" class="form-label d-flex justify-content-center">Car Model</label>
+        <select type="car_model_id" name="car_model_id" class="form-select form-select-lg" aria-label="Select Car Model">
           {{/with}}
-          {{#each manufacturers}}
-            <option {{#if (eq manufacturer_id ../data.manufacturer_id)}}selected{{/if}} value={{manufacturer_id}}>
-                {{manufacturer_id}} {{name}}
+          {{#each car_models}}
+            <option {{#if (eq car_model_id ../data.car_model_id)}}selected{{/if}} value={{car_model_id}}>
+                {{car_model_id}} {{model_name}}
             </option>
           {{/each}}
           {{#with data}}
         </select>
         </div>
         <div class="m-3">
-        <label for="Input3" class="form-label d-flex justify-content-center">Release year</label>
-        <input type="release_year" class="form-control form-control-lg" name="release_year" value="{{release_year}}">
+        <label for="Input3" class="form-label d-flex justify-content-center">Condition</label>
+        <input type="condition" class="form-control form-control-lg" name="condition" value="{{condition}}">
+        </div>
+        <div class="m-3">
+        <label for="Input3" class="form-label d-flex justify-content-center">Price per day</label>
+        <input type="price_per_day" class="form-control form-control-lg" name="price_per_day" value="{{price_per_day}}">
+        </div>
+        <div class="form-check m-3 d-flex justify-content-center">
+          <input class="form-check-input" type="checkbox" name="available" id="flexCheckChecked" {{#if available}}checked{{/if}}>
+            <label class="form-check-label mx-1" for="flexCheckChecked"> Available</label>
         </div>
         <div class="m-4 d-flex justify-content-center">
             <button class="btn btn-primary" type="submit">Submit</button>

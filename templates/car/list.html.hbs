@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <title>Library</title>
+  </head>
+  <body>
+    {{> nav user}}
+    {{#with data}}
+    <table class="table">
+    <thead>
+        <tr>
+        <th scope="col">Plate</th>
+        <th scope="col">Car Model Id</th>
+        <th scope="col">Available</th>
+        <th scope="col">Condition</th>
+        <th scope="col">Price per day</th>
+        <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each entities}}
+            <tr>
+                <th scope="row">{{plate_number}}</th>
+                <td><a href="/car_model/{{car_model_id}}">{{car_model_id}}</a></td>
+                <td>{{available}}</td>
+                <td>{{condition}}</td>
+                <td>{{price_per_day}}</td>
+                <td>
+                    <a href="/car/{{plate_number}}" class="btn btn-primary btn-sm" title="Show Info">Info</a>
+                    <a href="/car/update/{{plate_number}}" title="Edit" class="btn btn-primary btn-sm">Edit</a>
+                    <form action="/car/{{plate_number}}" method="post" style="display: inline;">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button class="btn btn-primary btn-sm" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        {{/each}}
+    </tbody>
+    </table>
+
+    <div class="m-2 d-flex justify-content-center">
+        <a href="/car/add" class="btn btn-primary">Add</a>
+    </div>
+    {{/with}}
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+  </body>
+</html>
+

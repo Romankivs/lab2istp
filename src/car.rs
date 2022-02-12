@@ -1,67 +1,113 @@
+use bigdecimal::{BigDecimal, FromPrimitive};
 use super::*;
 use serde_json::json;
 
-#[get("/manufacturer/<uid>")]
-pub async fn man_show(conn: LibraryDbConn, uid: i32, _user: StaffEntity) -> Result<Template> {
-    use schema::manufacturer::dsl::*;
-    let data : ManufacturerEntity = conn.run(move |c| manufacturer.filter(manufacturer_id.eq(uid)).first(c))
+#[get("/car/<uid>")]
+pub async fn car_show(conn: LibraryDbConn, uid: String, user: StaffEntity) -> Result<Template> {
+    use schema::car::dsl::*;
+    let data: CarEntity = conn
+        .run(move |c| car.filter(plate_number.eq(uid)).first(c))
         .await?;
-    Ok(Template::render("manufacturer/show", data))
+    Ok(Template::render(
+        "car/show",
+        json!({"data": data, "user": user}),
+    ))
 }
 
-#[post("/manufacturer", data = "<new>")]
-pub async fn man_new(conn: LibraryDbConn, new: Form<Manufacturer>, _user: StaffEntity) -> Result<Redirect> {
-    use schema::manufacturer::dsl::*;
-    conn
-        .run(move |c| insert_into(manufacturer).values(&*new).execute(c))
-        .await?;
-    Ok(Redirect::to(uri!(man_list)))
-}
-
-#[put("/manufacturer/<uid>", data = "<updated>")]
-pub async fn man_update(
+#[post("/car", data = "<new>")]
+pub async fn car_new(
     conn: LibraryDbConn,
-    uid: i32,
-    updated: Form<Manufacturer>,
-    _user: StaffEntity
+    new: Form<CarEntityForm>,
+    _user: StaffEntity,
 ) -> Result<Redirect> {
-    use schema::manufacturer::dsl::*;
-    let target = update(manufacturer).filter(manufacturer_id.eq(uid));
-    conn.run(move |c| target.set(&*updated).execute(c))
+    use schema::car::dsl::*;
+    let conv_bigdecimal: BigDecimal = BigDecimal::from_f32(new.price_per_day).expect("Conversion failed").with_scale(2);
+    let converted = CarEntity {
+        plate_number: new.plate_number.clone(),
+        car_model_id: new.car_model_id,
+        available: new.available,
+        condition: new.condition.clone(),
+        price_per_day: conv_bigdecimal
+    };
+    conn.run(move |c| insert_into(car).values(converted).execute(c))
         .await?;
-    Ok(Redirect::to(uri!(man_list)))
+    Ok(Redirect::to(uri!(car_list)))
 }
 
-#[delete("/manufacturer/<uid>")]
-pub async fn man_delete(conn: LibraryDbConn, uid: i32, _user: StaffEntity) -> Result<Redirect> {
-    use schema::manufacturer::dsl::*;
-    conn
-        .run(move |c| delete(manufacturer).filter(manufacturer_id.eq(uid)).execute(c))
+#[put("/car/<uid>", data = "<updated>")]
+pub async fn car_update(
+    conn: LibraryDbConn,
+    uid: String,
+    updated: Form<CarForm>,
+    _user: StaffEntity,
+) -> Result<Redirect> {
+    use schema::car::dsl::*;
+    let target = update(car).filter(plate_number.eq(uid));
+    let conv_bigdecimal: BigDecimal = BigDecimal::from_f32(updated.price_per_day).expect("Conversion failed").with_scale(2);
+    let converted = Car {
+        car_model_id: updated.car_model_id,
+        available: updated.available,
+        condition: updated.condition.clone(),
+        price_per_day: conv_bigdecimal
+    };
+    conn.run(move |c| target.set(converted).execute(c)).await?;
+    Ok(Redirect::to(uri!(car_list)))
+}
+
+#[delete("/car/<uid>")]
+pub async fn car_delete(conn: LibraryDbConn, uid: String, _user: StaffEntity) -> Result<Redirect> {
+    use schema::car::dsl::*;
+    conn.run(move |c| delete(car).filter(plate_number.eq(uid)).execute(c))
         .await?;
 
-    Ok(Redirect::to(uri!(man_list)))
+    Ok(Redirect::to(uri!(car_list)))
 }
 
-#[get("/manufacturer/add")]
-pub fn man_add_menu(_user: StaffEntity) -> Template {
-    Template::render("manufacturer/add", HashMap::<i32, i32>::new())
-}
-
-#[get("/manufacturer/update/<uid>")]
-pub async fn man_update_menu(conn: LibraryDbConn, uid: i32, _user: StaffEntity) -> Result<Template> {
-    use schema::manufacturer::dsl::*;
-    let data : ManufacturerEntity = conn.run(move |c| manufacturer.filter(manufacturer_id.eq(uid)).first(c))
+#[get("/car/add")]
+pub async fn car_add_menu(conn: LibraryDbConn, user: StaffEntity) -> Result<Template> {
+    use schema::car_model::dsl::*;
+    let car_models = conn
+        .run(|c| car_model.load::<CarModelEntity>(c))
         .await?;
-    Ok(Template::render("manufacturer/update", data))
+    Ok(Template::render(
+        "car/add",
+        json!({"car_models": car_models, "user": user}),
+    ))
 }
 
-#[get("/manufacturer/list")]
-pub async fn man_list(conn: LibraryDbConn, user: StaffEntity) -> Result<Template> {
-    use schema::manufacturer::dsl::*;
-    let all = conn.run(|c| manufacturer.load::<ManufacturerEntity>(c)).await?;
+#[get("/car/update/<uid>")]
+pub async fn car_update_menu(
+    conn: LibraryDbConn,
+    uid: String,
+    user: StaffEntity,
+) -> Result<Template> {
+    use schema::car::dsl::*;
+    let data: CarEntity = conn
+        .run(move |c| car.filter(plate_number.eq(uid)).first(c))
+        .await?;
+    use schema::car_model::dsl::*;
+    let car_models = conn
+        .run(|c| car_model.load::<CarModelEntity>(c))
+        .await?;
+    Ok(Template::render(
+        "car/update",
+        json!({"data": data,
+            "car_models": car_models,
+            "user": user
+        }),
+    ))
+}
+
+#[get("/car/list")]
+pub async fn car_list(conn: LibraryDbConn, user: StaffEntity) -> Result<Template> {
+    use schema::car::dsl::*;
+    let all = conn.run(|c| car.load::<CarEntity>(c)).await?;
     let context = json!({
         "entities": all,
         "user" : user
     });
-    Ok(Template::render("manufacturer/list", context))
+    Ok(Template::render(
+        "car/list",
+        json!({"data": context, "user": user}),
+    ))
 }

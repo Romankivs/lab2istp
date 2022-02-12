@@ -9,7 +9,7 @@ pub async fn car_mod_show(conn: LibraryDbConn, uid: i32, user: StaffEntity) -> R
         .await?;
     Ok(Template::render(
         "car_model/show",
-        json!({"data":data, "user": user}),
+        json!({"data": data, "user": user}),
     ))
 }
 
