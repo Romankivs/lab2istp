@@ -52,8 +52,15 @@ pub async fn man_delete(conn: LibraryDbConn, uid: i32, _user: StaffEntity) -> Re
 }
 
 #[get("/manufacturer/add")]
-pub fn man_add_menu(user: StaffEntity) -> Template {
-    Template::render("manufacturer/add", json!({ "user": user }))
+pub async fn man_add_menu(conn: LibraryDbConn, user: StaffEntity) -> Result<Template> {
+    use schema::country::dsl::*;
+    let countries = conn
+        .run(|c| country.load::<CountryEntity>(c))
+        .await?;
+    Ok(Template::render(
+        "manufacturer/add",
+        json!({"countries": countries, "user": user}),
+    ))
 }
 
 #[get("/manufacturer/update/<uid>")]
@@ -62,9 +69,16 @@ pub async fn man_update_menu(conn: LibraryDbConn, uid: i32, user: StaffEntity) -
     let data: ManufacturerEntity = conn
         .run(move |c| manufacturer.filter(manufacturer_id.eq(uid)).first(c))
         .await?;
+    use schema::country::dsl::*;
+    let countries = conn
+        .run(|c| country.load::<CountryEntity>(c))
+        .await?;
     Ok(Template::render(
         "manufacturer/update",
-        json!({"data":data, "user": user}),
+        json!({"data": data,
+            "countries": countries,
+            "user": user
+        }),
     ))
 }
 

@@ -5,7 +5,7 @@ use rocket_sync_db_pools::database;
 #[database("pg_library")]
 pub struct LibraryDbConn(diesel::PgConnection);
 
-use super::schema::{car, car_model, manufacturer, staff};
+use super::schema::{car, car_model, manufacturer, staff, country};
 
 #[derive(Queryable, Serialize)]
 pub struct StaffEntity {
@@ -26,10 +26,22 @@ pub struct Staff {
 }
 
 #[derive(Queryable, Serialize)]
+pub struct CountryEntity {
+    pub country_id: String,
+    pub name: String,
+}
+
+#[derive(Insertable, Serialize, Deserialize, AsChangeset, FromForm)]
+#[table_name = "country"]
+pub struct Country {
+    pub name: String
+}
+
+#[derive(Queryable, Serialize)]
 pub struct ManufacturerEntity {
     pub manufacturer_id: i32,
     pub name: String,
-    pub country: String,
+    pub country_id: String,
     pub website: String,
 }
 
@@ -37,7 +49,7 @@ pub struct ManufacturerEntity {
 #[table_name = "manufacturer"]
 pub struct Manufacturer {
     pub name: String,
-    pub country: String,
+    pub country_id: String,
     pub website: String,
 }
 

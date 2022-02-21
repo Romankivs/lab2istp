@@ -20,7 +20,11 @@
         </div>
         <div class="m-3">
         <label for="Input2" class="form-label d-flex justify-content-center">Country</label>
-        <input type="country" class="form-control form-control-lg" name="country" placeholder="Germany">
+        <select type="country_id" name="country_id" class="form-select form-select-lg" aria-label="Select Country">
+          {{#each countries}}
+            <option value={{country_id}}>{{country_id}} {{name}}</option>
+          {{/each}}
+        </select>
         </div>
         <div class="m-3">
         <label for="Input3" class="form-label d-flex justify-content-center">Website</label>
