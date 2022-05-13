@@ -12,28 +12,31 @@
     <title>Car Rental</title>
   </head>
   <body>
-    {{> nav}}
-    <form action="/data/{{staff_id}}" method="post" class="form-add">
-        <input type="hidden" name="_method" value="PUT">
+    {{> nav user}}
+    <form class="form-add" action="/customer" method="post">
         <div class="m-3">
-        <label for="Input0" class="form-label d-flex justify-content-center">ID</label>
-        <input type="id" class="form-control form-control-lg" name="id" value="{{staff_id}}">
+        <label for="Input1" class="form-label d-flex justify-content-center">Driver License Id</label>
+        <input type="driver_license_id" class="form-control form-control-lg" name="driver_license_id" placeholder="1111111">
         </div>
         <div class="m-3">
         <label for="Input1" class="form-label d-flex justify-content-center">First Name</label>
-        <input type="first_name" class="form-control form-control-lg" name="first_name" value="{{first_name}}">
+        <input type="first_name" class="form-control form-control-lg" name="first_name" placeholder="John">
         </div>
         <div class="m-3">
-        <label for="Input2" class="form-label d-flex justify-content-center">Last Name</label>
-        <input type="last_name" class="form-control form-control-lg" name="last_name" value="{{last_name}}">
+        <label for="Input1" class="form-label d-flex justify-content-center">Last Name</label>
+        <input type="last_name" class="form-control form-control-lg" name="last_name" placeholder="Doe">
+        </div>
+        <div class="m-3">
+        <label for="Input3" class="form-label d-flex justify-content-center">Birth Date</label>
+        <input type="birth_date" class="form-control form-control-lg" name="birth_date" placeholder="12-03-2022">
         </div>
         <div class="m-3">
         <label for="Input3" class="form-label d-flex justify-content-center">Email</label>
-        <input type="email" class="form-control form-control-lg" name="email" value="{{email}}">
+        <input type="email" class="form-control form-control-lg" name="email" placeholder="example@gmail.com">
         </div>
         <div class="m-3">
-        <label for="Input4" class="form-label d-flex justify-content-center">Password</label>
-        <input type="pwd" class="form-control form-control-lg" name="password" value="{{password}}">
+        <label for="Input3" class="form-label d-flex justify-content-center">Phone Number</label>
+        <input type="phone_number" class="form-control form-control-lg" name="phone_number" placeholder="0999999999">
         </div>
         <div class="m-4 d-flex justify-content-center">
             <button class="btn btn-primary" type="submit">Submit</button>

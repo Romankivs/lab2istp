@@ -16,24 +16,28 @@
     <table class="table">
     <thead>
         <tr>
-        <th scope="col">Manufacturer Id</th>
-        <th scope="col">Name</th>
-        <th scope="col">Country</th>
-        <th scope="col">Website</th>
+        <th scope="col">Driver License Id</th>
+        <th scope="col">First Name</th>
+        <th scope="col">Last Name</th>
+        <th scope="col">Birth Date</th>
+        <th scope="col">Email</th>
+        <th scope="col">Phone Number</th>
         <th scope="col">Actions</th>
         </tr>
     </thead>
     <tbody>
         {{#each entities}}
             <tr>
-                <th scope="row">{{manufacturer_id}}</th>
-                <td>{{name}}</td>
-                <td>{{country_id}}</td>
-                <td>{{website}}</td>
+                <th scope="row">{{driver_license_id}}</th>
+                <td>{{first_name}}</a></td>
+                <td>{{last_name}}</td>
+                <td>{{birth_date}}</td>
+                <td>{{email}}</td>
+                <td>{{phone_number}}</td>
                 <td>
-                    <a href="/manufacturer/{{manufacturer_id}}" class="btn btn-primary btn-sm" title="Show Info">Info</a>
-                    <a href="/manufacturer/update/{{manufacturer_id}}" title="Edit" class="btn btn-primary btn-sm">Edit</a>
-                    <form action="/manufacturer/{{manufacturer_id}}" method="post" style="display: inline;">
+                    <a href="/customer/{{driver_license_id}}" class="btn btn-primary btn-sm" title="Show Info">Info</a>
+                    <a href="/customer/update/{{driver_license_id}}" title="Edit" class="btn btn-primary btn-sm">Edit</a>
+                    <form action="/customer/{{driver_license_id}}" method="post" style="display: inline;">
                         <input type="hidden" name="_method" value="DELETE">
                         <button class="btn btn-primary btn-sm" type="submit">Delete</button>
                     </form>
@@ -44,7 +48,7 @@
     </table>
 
     <div class="m-2 d-flex justify-content-center">
-        <a href="/manufacturer/add" class="btn btn-primary">Add</a>
+        <a href="/customer/add" class="btn btn-primary">Add</a>
     </div>
     {{/with}}
 

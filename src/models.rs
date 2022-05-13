@@ -5,7 +5,7 @@ use rocket_sync_db_pools::database;
 #[database("pg_library")]
 pub struct LibraryDbConn(diesel::PgConnection);
 
-use super::schema::{car, car_model, manufacturer, staff, country};
+use super::schema::{car, car_model, manufacturer, staff, country, customer, rented_car};
 
 #[derive(Queryable, Serialize)]
 pub struct StaffEntity {
@@ -103,4 +103,71 @@ pub struct CarForm {
     pub available: bool,
     pub condition: String,
     pub price_per_day: f32,
+}
+
+#[derive(Insertable, Serialize, Deserialize, AsChangeset)]
+#[table_name = "customer"]
+pub struct Customer {
+    pub first_name : String,
+    pub last_name : String,
+    pub birth_date : chrono::NaiveDate,
+    pub email : String,
+    pub phone_number : String,
+}
+
+#[derive(FromForm)]
+pub struct CustomerEntityForm {
+    pub driver_license_id: i32,
+    pub first_name : String,
+    pub last_name : String,
+    pub birth_date : String,
+    pub email : String,
+    pub phone_number : String,
+}
+
+#[derive(Queryable, Serialize, Insertable)]
+#[table_name = "customer"]
+pub struct CustomerEntity {
+    pub driver_license_id: i32,
+    pub first_name : String,
+    pub last_name : String,
+    pub birth_date : chrono::NaiveDate,
+    pub email : String,
+    pub phone_number : String,
+}
+
+#[derive(Insertable, Serialize, Deserialize, AsChangeset)]
+#[table_name = "rented_car"]
+pub struct RentalCase {
+    pub staff_id : i32,
+    pub plate_number : String,
+    pub customer_id : i32,
+    pub rent_date : chrono::NaiveDate,
+    pub return_date: chrono::NaiveDate,
+    pub returned : bool,
+    pub comment : String,
+}
+
+#[derive(FromForm)]
+pub struct RentalCaseForm {
+    pub staff_id : i32,
+    pub plate_number : String,
+    pub customer_id : i32,
+    pub rent_date : String,
+    pub return_date: String,
+    pub returned : bool,
+    pub comment : String,
+}
+
+#[derive(Queryable, Serialize, Insertable)]
+#[table_name = "rented_car"]
+pub struct RentalCaseEntity {
+    pub rented_car_id: i32,
+    pub staff_id : i32,
+    pub plate_number : String,
+    pub customer_id : i32,
+    pub rent_date : chrono::NaiveDate,
+    pub return_date: chrono::NaiveDate,
+    pub returned : bool,
+    pub comment : String,
 }

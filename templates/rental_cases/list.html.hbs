@@ -16,24 +16,30 @@
     <table class="table">
     <thead>
         <tr>
-        <th scope="col">Manufacturer Id</th>
-        <th scope="col">Name</th>
-        <th scope="col">Country</th>
-        <th scope="col">Website</th>
-        <th scope="col">Actions</th>
+        <th scope="col">Id</th>
+        <th scope="col">Staff Id</th>
+        <th scope="col">Plate Number</th>
+        <th scope="col">Driver License Id</th>
+        <th scope="col">Rent Date</th>
+        <th scope="col">Return Date</th>
+        <th scope="col">Returned</th>
+        <th scope="col">Comment</th>
         </tr>
     </thead>
     <tbody>
         {{#each entities}}
             <tr>
-                <th scope="row">{{manufacturer_id}}</th>
-                <td>{{name}}</td>
-                <td>{{country_id}}</td>
-                <td>{{website}}</td>
+                <th scope="row">{{rented_car_id}}</th>
+                <td><a href="/data/{{staff_id}}">{{staff_id}}</a></td>
+                <td><a href="/car/{{plate_number}}">{{plate_number}}</a></td>
+                <td><a href="/customer/{{customer_id}}">{{customer_id}}</a></td>
+                <td>{{rent_date}}</td>
+                <td>{{return_date}}</td>
+                <td>{{returned}}</td>
                 <td>
-                    <a href="/manufacturer/{{manufacturer_id}}" class="btn btn-primary btn-sm" title="Show Info">Info</a>
-                    <a href="/manufacturer/update/{{manufacturer_id}}" title="Edit" class="btn btn-primary btn-sm">Edit</a>
-                    <form action="/manufacturer/{{manufacturer_id}}" method="post" style="display: inline;">
+                    <a href="/rental_cases/{{rented_car_id}}" class="btn btn-primary btn-sm" title="Show Info">Info</a>
+                    <a href="/rental_cases/update/{{rented_car_id}}" title="Edit" class="btn btn-primary btn-sm">Edit</a>
+                    <form action="/rental_cases/{{rented_car_id}}" method="post" style="display: inline;">
                         <input type="hidden" name="_method" value="DELETE">
                         <button class="btn btn-primary btn-sm" type="submit">Delete</button>
                     </form>
@@ -44,7 +50,7 @@
     </table>
 
     <div class="m-2 d-flex justify-content-center">
-        <a href="/manufacturer/add" class="btn btn-primary">Add</a>
+        <a href="/rental_cases/add" class="btn btn-primary">Add</a>
     </div>
     {{/with}}
 

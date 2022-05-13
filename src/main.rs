@@ -20,6 +20,8 @@ use auth::*;
 mod car;
 mod car_model;
 mod manufacturer;
+mod customer;
+mod rental_cases;
 
 type Result<T, E = Debug<diesel::result::Error>> = std::result::Result<T, E>;
 
@@ -159,7 +161,21 @@ fn rocket() -> _ {
                 car::car_show,
                 car::car_new,
                 car::car_update,
-                car::car_delete
+                car::car_delete,
+                customer::customer_list,
+                customer::customer_add_menu,
+                customer::customer_update_menu,
+                customer::customer_show,
+                customer::customer_new,
+                customer::customer_update,
+                customer::customer_delete,
+                rental_cases::rental_cases_list,
+                rental_cases::rental_cases_add_menu,
+                rental_cases::rental_cases_update_menu,
+                rental_cases::rental_cases_show,
+                rental_cases::rental_cases_new,
+                rental_cases::rental_cases_update,
+                rental_cases::rental_cases_delete
             ],
         )
         .attach(Template::fairing())
