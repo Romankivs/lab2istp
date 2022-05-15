@@ -20,15 +20,16 @@ pub async fn customer_new(
     _user: StaffEntity,
 ) -> Result<Redirect> {
     use schema::customer::dsl::*;
-    let conv_date: chrono::NaiveDate = chrono::NaiveDate::parse_from_str(&new.birth_date, "%Y-%m-%d")
-        .expect("Date conversion error");
+    let conv_date: chrono::NaiveDate =
+        chrono::NaiveDate::parse_from_str(&new.birth_date, "%Y-%m-%d")
+            .expect("Date conversion error");
     let converted = CustomerEntity {
         driver_license_id: new.driver_license_id,
         first_name: new.first_name.clone(),
         last_name: new.last_name.clone(),
         birth_date: conv_date,
         email: new.email.clone(),
-        phone_number: new.phone_number.clone()
+        phone_number: new.phone_number.clone(),
     };
     conn.run(move |c| insert_into(customer).values(converted).execute(c))
         .await?;
@@ -44,34 +45,40 @@ pub async fn customer_update(
 ) -> Result<Redirect> {
     use schema::customer::dsl::*;
     let target = update(customer).filter(driver_license_id.eq(uid));
-    let conv_date: chrono::NaiveDate = chrono::NaiveDate::parse_from_str(&updated.birth_date, "%Y-%m-%d")
-        .expect("Date conversion error");
+    let conv_date: chrono::NaiveDate =
+        chrono::NaiveDate::parse_from_str(&updated.birth_date, "%Y-%m-%d")
+            .expect("Date conversion error");
     let converted = Customer {
         first_name: updated.first_name.clone(),
         last_name: updated.last_name.clone(),
         birth_date: conv_date,
         email: updated.email.clone(),
-        phone_number: updated.phone_number.clone()
+        phone_number: updated.phone_number.clone(),
     };
     conn.run(move |c| target.set(converted).execute(c)).await?;
     Ok(Redirect::to(uri!(customer_list)))
 }
 
 #[delete("/customer/<uid>")]
-pub async fn customer_delete(conn: LibraryDbConn, uid: i32, _user: StaffEntity) -> Result<Redirect> {
+pub async fn customer_delete(
+    conn: LibraryDbConn,
+    uid: i32,
+    _user: StaffEntity,
+) -> Result<Redirect> {
     use schema::customer::dsl::*;
-    conn.run(move |c| delete(customer).filter(driver_license_id.eq(uid)).execute(c))
-        .await?;
+    conn.run(move |c| {
+        delete(customer)
+            .filter(driver_license_id.eq(uid))
+            .execute(c)
+    })
+    .await?;
 
     Ok(Redirect::to(uri!(customer_list)))
 }
 
 #[get("/customer/add")]
 pub async fn customer_add_menu(_conn: LibraryDbConn, user: StaffEntity) -> Result<Template> {
-    Ok(Template::render(
-        "customer/add",
-        json!({"user": user}),
-    ))
+    Ok(Template::render("customer/add", json!({ "user": user })))
 }
 
 #[get("/customer/update/<uid>")]

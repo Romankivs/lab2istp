@@ -1,6 +1,7 @@
 use super::*;
 use bigdecimal::{BigDecimal, FromPrimitive};
-use serde_json::json;
+use rocket::response::content;
+use serde_json::{from_value, json};
 
 #[get("/car/<uid>")]
 pub async fn car_show(conn: LibraryDbConn, uid: String, user: StaffEntity) -> Result<Template> {
@@ -96,6 +97,24 @@ pub async fn car_update_menu(
             "user": user
         }),
     ))
+}
+
+#[get("/car/diagram_info")]
+pub async fn car_diagram_info(conn: LibraryDbConn, _user: StaffEntity) -> Result<String> {
+    use schema::car::dsl::*;
+    let diagrams_data: Vec<(i32, i64)> = conn
+        .run(|c| {
+            car.select((
+                car_model_id,
+                diesel::dsl::sql::<diesel::sql_types::BigInt>("count(*)"),
+            ))
+            .group_by(car_model_id)
+            .load(c)
+        })
+        .await?;
+    let (x, y): (Vec<_>, Vec<_>) = diagrams_data.into_iter().unzip();
+    let value = json!({"diagrams_x" : x, "diagrams_y" : y});
+    Ok(value.to_string())
 }
 
 #[get("/car/list")]
