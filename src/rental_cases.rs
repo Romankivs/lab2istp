@@ -1,6 +1,5 @@
 use super::*;
 use calamine::{open_workbook, Reader, Xlsx};
-use rocket::data::Capped;
 use rocket::fs::TempFile;
 use serde_json::json;
 
@@ -214,6 +213,7 @@ pub struct Upload<'f> {
 #[post("/rental_cases/excel", data = "<new>")]
 pub async fn rental_cases_upload_excel(
     conn: LibraryDbConn,
+    _user: StaffEntity,
     mut new: Form<Upload<'_>>,
 ) -> Result<Redirect> {
     new.excel.copy_to("public/persist.xlsx").await.unwrap();
@@ -294,7 +294,7 @@ pub async fn rental_cases_upload_excel(
     }
 
     rental_cases_generate_excel(all);
-    Ok(Redirect::to(uri!(public_file("persist.xlsx"))))
+    Ok(Redirect::to(uri!("/rental_cases/list")))
 }
 
 #[get("/rental_cases/list")]

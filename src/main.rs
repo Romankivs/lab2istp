@@ -60,7 +60,7 @@ async fn delete_data(conn: LibraryDbConn, uid: i32) -> Result<Redirect> {
     Ok(Redirect::to(uri!(index)))
 }
 
-#[get("/data/add")]
+#[get("/register")]
 fn add_staff() -> Template {
     Template::render("add", HashMap::<i32, i32>::new())
 }
@@ -75,12 +75,11 @@ async fn update_staff(conn: LibraryDbConn, uid: i32) -> Result<Template> {
 }
 
 #[get("/")]
-async fn index(conn: LibraryDbConn) -> Result<Template> {
-    use schema::staff::dsl::*;
-    let all_users = conn.run(|c| staff.load::<StaffEntity>(c)).await?;
-    let mut context: HashMap<&str, Vec<StaffEntity>> = HashMap::new();
-    context.insert("users", all_users);
-    Ok(Template::render("index", context))
+async fn index(_conn: LibraryDbConn, user: Option<StaffEntity>) -> Redirect {
+    match user {
+        Option::Some(_) => Redirect::to(uri!("/car/list")),
+        Option::None => Redirect::to(uri!("/login"))
+    }
 }
 
 #[get("/login")]
@@ -118,6 +117,13 @@ async fn post_login(
     }
 }
 
+#[get("/logout")]
+async fn logout(jar: &CookieJar<'_>) -> Redirect {
+    jar.remove_private(Cookie::named("user_email"));
+    jar.remove_private(Cookie::named("user_password"));
+    Redirect::to(uri!("/"))
+}
+
 #[get("/public/<file..>")]
 async fn public_file(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(&format!("public/{}", file.to_str()?))
@@ -134,6 +140,7 @@ fn rocket() -> _ {
                 index,
                 login,
                 post_login,
+                logout,
                 public_file,
                 data,
                 new_data,

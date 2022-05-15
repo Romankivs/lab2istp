@@ -10,9 +10,6 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Home</a>
-                </li>
                <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="/car/list">Сars</a>
                 </li>
@@ -32,6 +29,9 @@
             <span class="text-uppercase">
                 {{first_name}} {{last_name}}
             </span>
+            <form method="get" action="/logout">
+                <button class="m-2 btn btn-primary" type="submit" href="/data/add">Logout</button>
+            </form>
             </div>
         </div>
     </nav>

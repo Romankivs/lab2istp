@@ -37,6 +37,7 @@
         <th scope="col">Return Date</th>
         <th scope="col">Returned</th>
         <th scope="col">Comment</th>
+        <th scope="col">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -49,6 +50,7 @@
                 <td>{{rent_date}}</td>
                 <td>{{return_date}}</td>
                 <td>{{returned}}</td>
+                <td>{{comment}}</td>
                 <td>
                     <a href="/rental_cases/{{rented_car_id}}" class="btn btn-primary btn-sm" title="Show Info">Info</a>
                     <a href="/rental_cases/update/{{rented_car_id}}" title="Edit" class="btn btn-primary btn-sm">Edit</a>

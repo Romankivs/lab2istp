@@ -70,19 +70,19 @@
             diagram_data = json;
             TESTER = document.getElementById('tester');
 
+            var stringsx = diagram_data.diagrams_x.toString().split(",");
+
             var data = [
               {
-                x: diagram_data.diagrams_x,
+                x: stringsx,
                 y: diagram_data.diagrams_y,
-                type: 'bar',
+                type: 'bar'
               }
             ];
             var layout1 = {
                   xaxis: {
-                    autotick: false,
                   },
                   yaxis: {
-                    autotick: false,
                   },
             };
             Plotly.newPlot(TESTER, data, layout1);
