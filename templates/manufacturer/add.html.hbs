@@ -15,11 +15,11 @@
     {{> nav user}}
     <form class="form-add" action="/manufacturer" method="post">
         <div class="m-3">
-        <label for="Input1" class="form-label d-flex justify-content-center">Name</label>
+        <label for="Input1" class="form-label d-flex justify-content-center">Назва</label>
         <input type="name" class="form-control form-control-lg" name="name" placeholder="BMW">
         </div>
         <div class="m-3">
-        <label for="Input2" class="form-label d-flex justify-content-center">Country</label>
+        <label for="Input2" class="form-label d-flex justify-content-center">Країна</label>
         <select type="country_id" name="country_id" class="form-select form-select-lg" aria-label="Select Country">
           {{#each countries}}
             <option value={{country_id}}>{{country_id}} {{name}}</option>
@@ -27,11 +27,11 @@
         </select>
         </div>
         <div class="m-3">
-        <label for="Input3" class="form-label d-flex justify-content-center">Website</label>
+        <label for="Input3" class="form-label d-flex justify-content-center">Сайт</label>
         <input type="website" class="form-control form-control-lg" name="website" placeholder="www.bmw.com">
         </div>
         <div class="m-4 d-flex justify-content-center">
-            <button class="btn btn-primary" type="submit">Submit</button>
+            <button class="btn btn-primary" type="submit">Підтвердити</button>
         </div>
     </form>
     <!-- Bootstrap Bundle with Popper -->

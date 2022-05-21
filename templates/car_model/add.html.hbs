@@ -15,23 +15,23 @@
     {{> nav user}}
     <form class="form-add" action="/car_model" method="post">
         <div class="m-3">
-        <label for="Input2" class="form-label d-flex justify-content-center">Manufacturer</label>
-        <select type="manufacturer_id" name="manufacturer_id" class="form-select form-select-lg" aria-label="Select Manufacturer">
+        <label for="Input2" class="form-label d-flex justify-content-center">Виробник</label>
+        <select type="manufacturer_id" name="manufacturer_id" class="form-select form-select-lg" aria-label="Виберіть Виробника">
           {{#each manufacturers}}
             <option value={{manufacturer_id}}>{{manufacturer_id}} {{name}}</option>
           {{/each}}
         </select>
         </div>
         <div class="m-3">
-        <label for="Input1" class="form-label d-flex justify-content-center">Model Name</label>
+        <label for="Input1" class="form-label d-flex justify-content-center">Назва моделі</label>
         <input type="model_name" class="form-control form-control-lg" name="model_name" placeholder="A8">
         </div>
         <div class="m-3">
-        <label for="Input3" class="form-label d-flex justify-content-center">Release Year</label>
+        <label for="Input3" class="form-label d-flex justify-content-center">Рік випуску</label>
         <input type="release_year" class="form-control form-control-lg" name="release_year" placeholder="1999">
         </div>
         <div class="m-4 d-flex justify-content-center">
-            <button class="btn btn-primary" type="submit">Submit</button>
+            <button class="btn btn-primary" type="submit">Пітвердити</button>
         </div>
     </form>
     <!-- Bootstrap Bundle with Popper -->

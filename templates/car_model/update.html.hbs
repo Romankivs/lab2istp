@@ -21,12 +21,12 @@
         <input readonly type="id" class="form-control form-control-lg" name="id" value="{{car_model_id}}">
         </div>
         <div class="m-3">
-        <label for="Input1" class="form-label d-flex justify-content-center">Model Name</label>
+        <label for="Input1" class="form-label d-flex justify-content-center">Назва моделі</label>
         <input type="model_name" class="form-control form-control-lg" name="model_name" value="{{model_name}}">
         </div>
         <div class="m-3">
-        <label for="Input2" class="form-label d-flex justify-content-center">Manufacturer</label>
-        <select type="manufacturer_id" name="manufacturer_id" class="form-select form-select-lg" aria-label="Select Manufacturer">
+        <label for="Input2" class="form-label d-flex justify-content-center">Виробник</label>
+        <select type="manufacturer_id" name="manufacturer_id" class="form-select form-select-lg" aria-label="Виберіть виробника">
           {{/with}}
           {{#each manufacturers}}
             <option {{#if (eq manufacturer_id ../data.manufacturer_id)}}selected{{/if}} value={{manufacturer_id}}>
@@ -37,11 +37,11 @@
         </select>
         </div>
         <div class="m-3">
-        <label for="Input3" class="form-label d-flex justify-content-center">Release year</label>
+        <label for="Input3" class="form-label d-flex justify-content-center">Рік випуску</label>
         <input type="release_year" class="form-control form-control-lg" name="release_year" value="{{release_year}}">
         </div>
         <div class="m-4 d-flex justify-content-center">
-            <button class="btn btn-primary" type="submit">Submit</button>
+            <button class="btn btn-primary" type="submit">Підтвердити</button>
         </div>
         {{/with}}
     </form>

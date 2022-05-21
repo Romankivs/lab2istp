@@ -27,9 +27,9 @@ pub async fn rental_cases_new(
 ) -> Result<Redirect> {
     use schema::rented_car::dsl::*;
     let conv_date_rent: chrono::NaiveDate =
-        chrono::NaiveDate::parse_from_str(&new.rent_date, "%Y-%m-%d").unwrap();
+        chrono::NaiveDate::parse_from_str(&new.rent_date, "%d.%m.%Y").unwrap();
     let conv_date_return: chrono::NaiveDate =
-        chrono::NaiveDate::parse_from_str(&new.return_date, "%Y-%m-%d").unwrap();
+        chrono::NaiveDate::parse_from_str(&new.return_date, "%d.%m.%Y").unwrap();
     let converted = RentalCase {
         staff_id: new.staff_id,
         plate_number: new.plate_number.clone(),
@@ -54,10 +54,10 @@ pub async fn rental_cases_update(
     use schema::rented_car::dsl::*;
     let target = update(rented_car).filter(rented_car_id.eq(uid));
     let conv_date_rent: chrono::NaiveDate =
-        chrono::NaiveDate::parse_from_str(&updated.rent_date, "%Y-%m-%d")
+        chrono::NaiveDate::parse_from_str(&updated.rent_date, "%d.%m.%Y")
             .expect("Date conversion error");
     let conv_date_return: chrono::NaiveDate =
-        chrono::NaiveDate::parse_from_str(&updated.return_date, "%Y-%m-%d")
+        chrono::NaiveDate::parse_from_str(&updated.return_date, "%d.%m.%Y")
             .expect("Date conversion error");
     let converted = RentalCase {
         staff_id: updated.staff_id,
@@ -106,12 +106,24 @@ pub async fn rental_cases_update_menu(
     user: StaffEntity,
 ) -> Result<Template> {
     use schema::rented_car::dsl::*;
-    let data: RentalCaseEntity = conn
+    let e: RentalCaseEntity = conn
         .run(move |c| rented_car.filter(rented_car_id.eq(uid)).first(c))
         .await?;
     use schema::car::dsl::*;
     use schema::customer::dsl::*;
     use schema::staff::dsl::*;
+    let data = RentalCaseEntityShowHelper
+    {
+        rented_car_id: e.rented_car_id,
+        staff_id: e.staff_id,
+        plate_number: e.plate_number,
+        customer_id: e.customer_id,
+        rent_date: e.rent_date.format("%d.%m.%Y").to_string(),
+        return_date: e.return_date.format("%d.%m.%Y").to_string(),
+        returned: e.returned,
+        comment: e.comment,
+    };
+
     let staff_members = conn.run(|c| staff.load::<StaffEntity>(c)).await?;
     let cars = conn.run(|c| car.load::<CarEntity>(c)).await?;
     let customers = conn.run(|c| customer.load::<CustomerEntity>(c)).await?;
@@ -130,28 +142,28 @@ fn rental_cases_generate_excel(entities: Vec<RentalCaseEntity>) -> () {
     let mut sheet1 = workbook.add_worksheet(Option::Some("Sheet1")).unwrap();
     let bold = workbook.add_format().set_bold();
     sheet1
-        .write_string(0, 0, "Rental Case Id", Option::Some(&bold))
+        .write_string(0, 0, "Id Випадку оренди", Option::Some(&bold))
         .unwrap();
     sheet1
-        .write_string(0, 1, "Staff Id", Option::Some(&bold))
+        .write_string(0, 1, "Id Працівника", Option::Some(&bold))
         .unwrap();
     sheet1
-        .write_string(0, 2, "Car Plate Number", Option::Some(&bold))
+        .write_string(0, 2, "Номер авто", Option::Some(&bold))
         .unwrap();
     sheet1
-        .write_string(0, 3, "Customer's Driver License Id", Option::Some(&bold))
+        .write_string(0, 3, "Номер водійського посвідчення", Option::Some(&bold))
         .unwrap();
     sheet1
-        .write_string(0, 4, "Rent Date", Option::Some(&bold))
+        .write_string(0, 4, "Дата оренди", Option::Some(&bold))
         .unwrap();
     sheet1
-        .write_string(0, 5, "Return Date", Option::Some(&bold))
+        .write_string(0, 5, "Дата повернення", Option::Some(&bold))
         .unwrap();
     sheet1
-        .write_string(0, 6, "Returned", Option::Some(&bold))
+        .write_string(0, 6, "Повернено", Option::Some(&bold))
         .unwrap();
     sheet1
-        .write_string(0, 7, "Comment", Option::Some(&bold))
+        .write_string(0, 7, "Коментар", Option::Some(&bold))
         .unwrap();
     for (i, elem) in entities.iter().enumerate() {
         sheet1
@@ -175,7 +187,7 @@ fn rental_cases_generate_excel(entities: Vec<RentalCaseEntity>) -> () {
             .write_string(
                 i as u32 + 1,
                 4,
-                &elem.rent_date.format("%Y-%m-%d").to_string(),
+                &elem.rent_date.format("%d.%m.%Y").to_string(),
                 Option::None,
             )
             .unwrap();
@@ -183,7 +195,7 @@ fn rental_cases_generate_excel(entities: Vec<RentalCaseEntity>) -> () {
             .write_string(
                 i as u32 + 1,
                 5,
-                &elem.return_date.format("%Y-%m-%d").to_string(),
+                &elem.return_date.format("%d.%m.%Y").to_string(),
                 Option::None,
             )
             .unwrap();
@@ -262,7 +274,7 @@ pub async fn rental_cases_upload_excel(
                     .get_string()
                     .unwrap()
                     .to_string(),
-                "%Y-%m-%d",
+                "%d.%m.%Y",
             )
             .unwrap(),
             return_date: chrono::NaiveDate::parse_from_str(
@@ -272,7 +284,7 @@ pub async fn rental_cases_upload_excel(
                     .get_string()
                     .unwrap()
                     .to_string(),
-                "%Y-%m-%d",
+                "%d.%m.%Y",
             )
             .unwrap(),
             returned: range
@@ -301,8 +313,24 @@ pub async fn rental_cases_upload_excel(
 pub async fn rental_cases_list(conn: LibraryDbConn, user: StaffEntity) -> Result<Template> {
     use schema::rented_car::dsl::*;
     let all = conn.run(|c| rented_car.load::<RentalCaseEntity>(c)).await?;
+    let mut vec_show = Vec::new();
+    for e in all
+    {
+        let data = RentalCaseEntityShowHelper
+        {
+            rented_car_id: e.rented_car_id,
+            staff_id: e.staff_id,
+            plate_number: e.plate_number,
+            customer_id: e.customer_id,
+            rent_date: e.rent_date.format("%d.%m.%Y").to_string(),
+            return_date: e.return_date.format("%d.%m.%Y").to_string(),
+            returned: e.returned,
+            comment: e.comment,
+        };
+        vec_show.push(data);
+    }
     let context = json!({
-        "entities" : all,
+        "entities" : vec_show,
         "user" : user
     });
     Ok(Template::render(

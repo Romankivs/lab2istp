@@ -22,12 +22,12 @@
     <table class="table">
     <thead>
         <tr>
-        <th scope="col">Plate</th>
-        <th scope="col">Car Model Id</th>
-        <th scope="col">Available</th>
-        <th scope="col">Condition</th>
-        <th scope="col">Price per day</th>
-        <th scope="col">Actions</th>
+        <th scope="col">Номер</th>
+        <th scope="col">Id Моделі</th>
+        <th scope="col">Доступне</th>
+        <th scope="col">Стан</th>
+        <th scope="col">Ціна за день</th>
+        <th scope="col">Дії</th>
         </tr>
     </thead>
     <tbody>
@@ -39,11 +39,11 @@
                 <td>{{condition}}</td>
                 <td>{{price_per_day}}</td>
                 <td>
-                    <a href="/car/{{plate_number}}" class="btn btn-primary btn-sm" title="Show Info">Info</a>
-                    <a href="/car/update/{{plate_number}}" title="Edit" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="/car/{{plate_number}}" class="btn btn-primary btn-sm" title="Show Info">Інфо</a>
+                    <a href="/car/update/{{plate_number}}" title="Edit" class="btn btn-primary btn-sm">Змінити</a>
                     <form action="/car/{{plate_number}}" method="post" style="display: inline;">
                         <input type="hidden" name="_method" value="DELETE">
-                        <button class="btn btn-primary btn-sm" type="submit">Delete</button>
+                        <button class="btn btn-primary btn-sm" type="submit">Видалити</button>
                     </form>
                 </td>
             </tr>
@@ -52,7 +52,7 @@
     </table>
 
     <div class="m-2 d-flex justify-content-center">
-        <a href="/car/add" class="btn btn-primary">Add</a>
+        <a href="/car/add" class="btn btn-primary">Додати</a>
     </div>
     {{/with}}
 

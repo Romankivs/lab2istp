@@ -17,7 +17,7 @@
     <form action="/car/{{plate_number}}" method="post" class="form-add">
         <input type="hidden" name="_method" value="PUT">
         <div class="m-3">
-        <label for="Input2" class="form-label d-flex justify-content-center">Car Model</label>
+        <label for="Input2" class="form-label d-flex justify-content-center">Модель</label>
         <select type="car_model_id" name="car_model_id" class="form-select form-select-lg" aria-label="Select Car Model">
           {{/with}}
           {{#each car_models}}
@@ -29,19 +29,19 @@
         </select>
         </div>
         <div class="m-3">
-        <label for="Input3" class="form-label d-flex justify-content-center">Condition</label>
+        <label for="Input3" class="form-label d-flex justify-content-center">Стан</label>
         <input type="condition" class="form-control form-control-lg" name="condition" value="{{condition}}">
         </div>
         <div class="m-3">
-        <label for="Input3" class="form-label d-flex justify-content-center">Price per day</label>
+        <label for="Input3" class="form-label d-flex justify-content-center">Ціна за день</label>
         <input type="price_per_day" class="form-control form-control-lg" name="price_per_day" value="{{price_per_day}}">
         </div>
         <div class="form-check m-3 d-flex justify-content-center">
           <input class="form-check-input" type="checkbox" name="available" id="flexCheckChecked" {{#if available}}checked{{/if}}>
-            <label class="form-check-label mx-1" for="flexCheckChecked"> Available</label>
+            <label class="form-check-label mx-1" for="flexCheckChecked"> Доступне</label>
         </div>
         <div class="m-4 d-flex justify-content-center">
-            <button class="btn btn-primary" type="submit">Submit</button>
+            <button class="btn btn-primary" type="submit">Підтвердити</button>
         </div>
         {{/with}}
     </form>

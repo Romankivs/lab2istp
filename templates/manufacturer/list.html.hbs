@@ -16,11 +16,11 @@
     <table class="table">
     <thead>
         <tr>
-        <th scope="col">Manufacturer Id</th>
-        <th scope="col">Name</th>
-        <th scope="col">Country</th>
-        <th scope="col">Website</th>
-        <th scope="col">Actions</th>
+        <th scope="col">Id Виробника</th>
+        <th scope="col">Назва</th>
+        <th scope="col">Країна</th>
+        <th scope="col">Сайт</th>
+        <th scope="col">Дії</th>
         </tr>
     </thead>
     <tbody>
@@ -31,11 +31,11 @@
                 <td>{{country_id}}</td>
                 <td>{{website}}</td>
                 <td>
-                    <a href="/manufacturer/{{manufacturer_id}}" class="btn btn-primary btn-sm" title="Show Info">Info</a>
-                    <a href="/manufacturer/update/{{manufacturer_id}}" title="Edit" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="/manufacturer/{{manufacturer_id}}" class="btn btn-primary btn-sm" title="Show Info">Інфо</a>
+                    <a href="/manufacturer/update/{{manufacturer_id}}" title="Edit" class="btn btn-primary btn-sm">Змінити</a>
                     <form action="/manufacturer/{{manufacturer_id}}" method="post" style="display: inline;">
                         <input type="hidden" name="_method" value="DELETE">
-                        <button class="btn btn-primary btn-sm" type="submit">Delete</button>
+                        <button class="btn btn-primary btn-sm" type="submit">Видалити</button>
                     </form>
                 </td>
             </tr>
@@ -44,7 +44,7 @@
     </table>
 
     <div class="m-2 d-flex justify-content-center">
-        <a href="/manufacturer/add" class="btn btn-primary">Add</a>
+        <a href="/manufacturer/add" class="btn btn-primary">Додати</a>
     </div>
     {{/with}}
 

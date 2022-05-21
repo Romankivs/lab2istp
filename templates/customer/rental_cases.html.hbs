@@ -12,19 +12,6 @@
   </head>
   <body>
     {{> nav user}}
-    <div class="m-2 d-flex">
-        <form action="/rental_cases/excel" enctype="multipart/form-data" method="post">
-          <div class="form-group">
-            <button class="btn btn-primary btn-sm" type="submit">Імпорт з Excel</button>
-            <input type="file" name="excel" class="form-control-file" id="excel">
-          </div>
-        </form>
-    </div>
-    <div class="m-2 d-flex">
-        <form action="/rental_cases/excel">
-            <button class="btn btn-primary btn-sm" type="submit">Експорт в Excel</button>
-        </form>
-    </div>
     {{#with data}}
     <table class="table">
     <thead>

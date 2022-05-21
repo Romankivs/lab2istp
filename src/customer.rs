@@ -4,9 +4,17 @@ use serde_json::json;
 #[get("/customer/<uid>")]
 pub async fn customer_show(conn: LibraryDbConn, uid: i32, user: StaffEntity) -> Result<Template> {
     use schema::customer::dsl::*;
-    let data: CustomerEntity = conn
+    let e: CustomerEntity = conn
         .run(move |c| customer.filter(driver_license_id.eq(uid)).first(c))
         .await?;
+    let data = CustomerShowHelper{
+        driver_license_id: e.driver_license_id,
+        first_name: e.first_name,
+        last_name: e.last_name,
+        birth_date: e.birth_date.format("%d.%m.%Y").to_string(),
+        email: e.email,
+        phone_number: e.phone_number
+    };
     Ok(Template::render(
         "customer/show",
         json!({"data": data, "user": user}),
@@ -21,7 +29,7 @@ pub async fn customer_new(
 ) -> Result<Redirect> {
     use schema::customer::dsl::*;
     let conv_date: chrono::NaiveDate =
-        chrono::NaiveDate::parse_from_str(&new.birth_date, "%Y-%m-%d")
+        chrono::NaiveDate::parse_from_str(&new.birth_date, "%d.%m.%Y")
             .expect("Date conversion error");
     let converted = CustomerEntity {
         driver_license_id: new.driver_license_id,
@@ -46,7 +54,7 @@ pub async fn customer_update(
     use schema::customer::dsl::*;
     let target = update(customer).filter(driver_license_id.eq(uid));
     let conv_date: chrono::NaiveDate =
-        chrono::NaiveDate::parse_from_str(&updated.birth_date, "%Y-%m-%d")
+        chrono::NaiveDate::parse_from_str(&updated.birth_date, "%d.%m.%Y")
             .expect("Date conversion error");
     let converted = Customer {
         first_name: updated.first_name.clone(),
@@ -88,9 +96,17 @@ pub async fn customer_update_menu(
     user: StaffEntity,
 ) -> Result<Template> {
     use schema::customer::dsl::*;
-    let data: CustomerEntity = conn
+    let e: CustomerEntity = conn
         .run(move |c| customer.filter(driver_license_id.eq(uid)).first(c))
         .await?;
+    let data = CustomerShowHelper{
+        driver_license_id: e.driver_license_id,
+        first_name: e.first_name,
+        last_name: e.last_name,
+        birth_date: e.birth_date.format("%d.%m.%Y").to_string(),
+        email: e.email,
+        phone_number: e.phone_number
+    };
     Ok(Template::render(
         "customer/update",
         json!({"data": data,
@@ -103,12 +119,39 @@ pub async fn customer_update_menu(
 pub async fn customer_list(conn: LibraryDbConn, user: StaffEntity) -> Result<Template> {
     use schema::customer::dsl::*;
     let all = conn.run(|c| customer.load::<CustomerEntity>(c)).await?;
+    let mut show_vec : Vec<CustomerShowHelper> = Vec::new();
+    for e in all
+    {
+        show_vec.push(CustomerShowHelper{
+            driver_license_id: e.driver_license_id,
+            first_name: e.first_name,
+            last_name: e.last_name,
+            birth_date: e.birth_date.format("%d.%m.%Y").to_string(),
+            email: e.email,
+            phone_number: e.phone_number
+        })
+    }
     let context = json!({
-        "entities": all,
+        "entities": show_vec,
         "user" : user
     });
     Ok(Template::render(
         "customer/list",
+        json!({"data": context, "user": user}),
+    ))
+}
+
+#[get("/customer/rental_cases/<uid>")]
+pub async fn customer_rental_cases(conn: LibraryDbConn, uid: i32, user: StaffEntity) -> Result<Template>
+{
+    use schema::rented_car::dsl::*;
+    let all = conn.run(move |c| rented_car.filter(customer_id.eq(uid)).load::<RentalCaseEntity>(c)).await?;
+    let context = json!({
+        "entities" : all,
+        "user" : user
+    });
+    Ok(Template::render(
+        "customer/rental_cases",
         json!({"data": context, "user": user}),
     ))
 }

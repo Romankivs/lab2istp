@@ -15,47 +15,47 @@
     {{> nav user}}
     <form class="form-add" action="/rental_cases" method="post">
         <div class="m-3">
-        <label for="Input2" class="form-label d-flex justify-content-center">Staff Id</label>
-        <select type="staff_id" name="staff_id" class="form-select form-select-lg" aria-label="Select Staff Id">
+        <label for="Input2" class="form-label d-flex justify-content-center">Id Працівника</label>
+        <select type="staff_id" name="staff_id" class="form-select form-select-lg" aria-label="Виберіть Id Працівника">
           {{#each staff}}
             <option value={{staff_id}}>{{staff_id}} {{first_name}} {{last_name}}</option>
           {{/each}}
         </select>
         </div>
         <div class="m-3">
-        <label for="Input2" class="form-label d-flex justify-content-center">Plate Number</label>
-        <select type="plate_number" name="plate_number" class="form-select form-select-lg" aria-label="Select Car Plate Number">
+        <label for="Input2" class="form-label d-flex justify-content-center">Номер авто</label>
+        <select type="plate_number" name="plate_number" class="form-select form-select-lg" aria-label="Виберіть номер авто">
           {{#each cars}}
             <option value={{plate_number}}>{{plate_number}}</option>
           {{/each}}
         </select>
         </div>
         <div class="m-3">
-        <label for="Input2" class="form-label d-flex justify-content-center">Driver License Id</label>
-        <select type="customer_id" name="customer_id" class="form-select form-select-lg" aria-label="Driver License Id">
+        <label for="Input2" class="form-label d-flex justify-content-center">Номер водійського посвідчення</label>
+        <select type="customer_id" name="customer_id" class="form-select form-select-lg" aria-label="Виберіть номер водійського посвідчення">
           {{#each customers}}
             <option value={{driver_license_id}}>{{driver_license_id}} {{first_name}} {{last_name}}</option>
           {{/each}}
         </select>
         </div>
         <div class="m-3">
-        <label for="Input1" class="form-label d-flex justify-content-center">Rent Date</label>
-        <input type="rent_date" class="form-control form-control-lg" name="rent_date" placeholder="2022-10-11">
+        <label for="Input1" class="form-label d-flex justify-content-center">Дата оренди</label>
+        <input type="rent_date" class="form-control form-control-lg" name="rent_date" placeholder="15.11.2020">
         </div>
         <div class="m-3">
-        <label for="Input3" class="form-label d-flex justify-content-center">Return date</label>
-        <input type="return_date" class="form-control form-control-lg" name="return_date" placeholder="2024-10-11">
+        <label for="Input3" class="form-label d-flex justify-content-center">Дата повернення</label>
+        <input type="return_date" class="form-control form-control-lg" name="return_date" placeholder="15.11.2024">
         </div>
         <div class="form-check m-3 d-flex justify-content-center">
           <input class="form-check-input" type="checkbox" name="returned" value="" id="flexCheckChecked" checked>
-            <label class="form-check-label mx-1" for="flexCheckChecked"> Returned</label>
+            <label class="form-check-label mx-1" for="flexCheckChecked"> Повернено</label>
         </div>
         <div class="m-3">
-        <label for="Input1" class="form-label d-flex justify-content-center">Comment</label>
+        <label for="Input1" class="form-label d-flex justify-content-center">Коментар</label>
         <input type="comment" class="form-control form-control-lg" name="comment" placeholder="Nothing to say">
         </div>
         <div class="m-4 d-flex justify-content-center">
-            <button class="btn btn-primary" type="submit">Submit</button>
+            <button class="btn btn-primary" type="submit">Підтвердити</button>
         </div>
     </form>
     <!-- Bootstrap Bundle with Popper -->

@@ -171,6 +171,7 @@ fn rocket() -> _ {
                 car::car_delete,
                 car::car_diagram_info,
                 customer::customer_list,
+                customer::customer_rental_cases,
                 customer::customer_add_menu,
                 customer::customer_update_menu,
                 customer::customer_show,

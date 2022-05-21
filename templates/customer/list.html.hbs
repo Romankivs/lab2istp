@@ -16,13 +16,13 @@
     <table class="table">
     <thead>
         <tr>
-        <th scope="col">Driver License Id</th>
-        <th scope="col">First Name</th>
-        <th scope="col">Last Name</th>
-        <th scope="col">Birth Date</th>
-        <th scope="col">Email</th>
-        <th scope="col">Phone Number</th>
-        <th scope="col">Actions</th>
+        <th scope="col">Номер водійського посвідчення</th>
+        <th scope="col">Ім'я</th>
+        <th scope="col">Прізвище</th>
+        <th scope="col">Дата народження</th>
+        <th scope="col">Пошта</th>
+        <th scope="col">Номер телефону</th>
+        <th scope="col">Дії</th>
         </tr>
     </thead>
     <tbody>
@@ -35,11 +35,12 @@
                 <td>{{email}}</td>
                 <td>{{phone_number}}</td>
                 <td>
-                    <a href="/customer/{{driver_license_id}}" class="btn btn-primary btn-sm" title="Show Info">Info</a>
-                    <a href="/customer/update/{{driver_license_id}}" title="Edit" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="/customer/rental_cases/{{driver_license_id}}" class="btn btn-primary btn-sm" title="Show Rental Cases">Випадки оренди</a>
+                    <a href="/customer/{{driver_license_id}}" class="btn btn-primary btn-sm" title="Show Info">Інфо</a>
+                    <a href="/customer/update/{{driver_license_id}}" title="Edit" class="btn btn-primary btn-sm">Змінити</a>
                     <form action="/customer/{{driver_license_id}}" method="post" style="display: inline;">
                         <input type="hidden" name="_method" value="DELETE">
-                        <button class="btn btn-primary btn-sm" type="submit">Delete</button>
+                        <button class="btn btn-primary btn-sm" type="submit">Видалити</button>
                     </form>
                 </td>
             </tr>
@@ -48,7 +49,7 @@
     </table>
 
     <div class="m-2 d-flex justify-content-center">
-        <a href="/customer/add" class="btn btn-primary">Add</a>
+        <a href="/customer/add" class="btn btn-primary">Додати</a>
     </div>
     {{/with}}
 

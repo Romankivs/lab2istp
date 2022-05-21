@@ -17,31 +17,31 @@
     <form action="/customer/{{driver_license_id}}" method="post" class="form-add">
         <input type="hidden" name="_method" value="PUT">
         <div class="m-3">
-        <label for="Input1" class="form-label d-flex justify-content-center">Driver License Id</label>
+        <label for="Input1" class="form-label d-flex justify-content-center">Номер водійського посвідчення</label>
         <input type="driver_license_id" class="form-control form-control-lg" name="driver_license_id" value={{driver_license_id}}>
         </div>
         <div class="m-3">
-        <label for="Input1" class="form-label d-flex justify-content-center">First Name</label>
+        <label for="Input1" class="form-label d-flex justify-content-center">Ім'я</label>
         <input type="first_name" class="form-control form-control-lg" name="first_name" value={{first_name}}>
         </div>
         <div class="m-3">
-        <label for="Input1" class="form-label d-flex justify-content-center">Last Name</label>
+        <label for="Input1" class="form-label d-flex justify-content-center">Прізвище</label>
         <input type="last_name" class="form-control form-control-lg" name="last_name" value={{last_name}}>
         </div>
         <div class="m-3">
-        <label for="Input3" class="form-label d-flex justify-content-center">Birth Date</label>
+        <label for="Input3" class="form-label d-flex justify-content-center">Дата народження</label>
         <input type="birth_date" class="form-control form-control-lg" name="birth_date" value={{birth_date}}>
         </div>
         <div class="m-3">
-        <label for="Input3" class="form-label d-flex justify-content-center">Email</label>
+        <label for="Input3" class="form-label d-flex justify-content-center">Пошта</label>
         <input type="email" class="form-control form-control-lg" name="email" value={{email}}>
         </div>
         <div class="m-3">
-        <label for="Input3" class="form-label d-flex justify-content-center">Phone Number</label>
+        <label for="Input3" class="form-label d-flex justify-content-center">Номер телефону</label>
         <input type="phone_number" class="form-control form-control-lg" name="phone_number" value={{phone_number}}>
         </div>
         <div class="m-4 d-flex justify-content-center">
-            <button class="btn btn-primary" type="submit">Submit</button>
+            <button class="btn btn-primary" type="submit">Підтвердити</button>
         </div>
         {{/with}}
     </form>
