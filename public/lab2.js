@@ -1,17 +1,23 @@
-const uri = 'api/Categories';
-let categories = [];
-function getCategories() {
-    fetch(uri)
+const uri = '/tableware';
+let tablewares = [];
+function getTableware() {
+    fetch(uri + "/list")
         .then(response => response.json())
-.then(data => _displayCategories(data))
-.catch(error => console.error('Unable to get categories.', error));
+.then(data => _displayTableware(data))
+.catch(error => console.error('Unable to get tableware.', error));
 }
-function addCategory() {
-    const addNameTextbox = document.getElementById('add-name');
-    const addInfoTextbox = document.getElementById('add-desctiption');
-    const category = {
+function addTableware() {
+    const addManIdTextbox = document.getElementById('add_manufacturer_id');
+    const addNameTextbox = document.getElementById('add_name');
+    const addTypeTextbox = document.getElementById('add_type');
+    const addMaterialTextbox = document.getElementById('add_main_material');
+    const addColourTextbox = document.getElementById('add_main_colour');
+    const tableware = {
+        manufacturer_id : parseInt(addManIdTextbox.value.trim()),
         name: addNameTextbox.value.trim(),
-        info: addInfoTextbox.value.trim(),
+        type_ : addTypeTextbox.value.trim(),
+        main_material: addMaterialTextbox.value.trim(),
+        main_colour : addColourTextbox.value.trim()
     };
     fetch(uri, {
         method: 'POST',
@@ -20,76 +26,96 @@ function addCategory() {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
     },
-    body: JSON.stringify(category)
+    body: JSON.stringify(tableware)
 })
 .then(response => response.json())
 .then(() => {
-        getCategories();
+        getTableware();
+        addManIdTextbox.value = '';
         addNameTextbox.value = '';
-    addInfoTextbox.value = '';
+        addTypeTextbox.value = '';
+        addMaterialTextbox.value = '';
+        addColourTextbox.value = '';
 })
-.catch(error => console.error('Unable to add category.', error));
+.catch(error => console.error('Unable to add tableware.', error));
 }
 function deleteCategory(id) {
     fetch(`${uri}/${id}`, {
         method: 'DELETE'
 })
-.then(() => getCategories())
-.catch(error => console.error('Unable to delete category.', error));
+.then(() => getTableware())
+.catch(error => console.error('Unable to delete tableware.', error));
 }
 function displayEditForm(id) {
-    const category = categories.find(category => category.id === id);
-    document.getElementById('edit-id').value = category.id;
-    document.getElementById('edit-name').value = category.name;
-    document.getElementById('edit-desctiption').value = category.info;
-    document.getElementById('editForm').style.display = 'block';
+    const tableware = tablewares.find(tableware => tableware.tableware_id === id);
+    document.getElementById('edit_id').value = tableware.tableware_id;
+    document.getElementById('edit_manufacturer_id').value = tableware.manufacturer_id;
+    document.getElementById('edit_name').value = tableware.name;
+    document.getElementById('edit_type').value = tableware.type_;
+    document.getElementById('edit_main_material').value = tableware.main_material;
+    document.getElementById('edit_main_colour').value = tableware.main_colour;
+    document.getElementById('editTableware').style.display = 'block';
 }
-function updateCategory() {
-    const categoryId = document.getElementById('edit-id').value;
-    const category = {
-        id: parseInt(categoryId, 10),
-        name: document.getElementById('edit-name').value.trim(),
-        info: document.getElementById('edit-desctiption').value.trim()
+function updateTableware() {
+    const tablewareId = parseInt(document.getElementById('edit_id').value.trim());
+    const tableware = {
+            manufacturer_id: parseInt(document.getElementById('edit_manufacturer_id').value.trim()),
+            name: document.getElementById('edit_name').value.trim(),
+            type_: document.getElementById('edit_type').value.trim(),
+            main_material: document.getElementById('edit_main_material').value.trim(),
+            main_colour: document.getElementById('edit_main_colour').value.trim()
 };
-    fetch(`${uri}/${categoryId}`, {
+    fetch(uri + "/" + tablewareId, {
         method: 'PUT',
     headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
     },
-    body: JSON.stringify(category)
+    body: JSON.stringify(tableware)
 })
-.then(() => getCategories())
-.catch(error => console.error('Unable to update category.', error));
+.then(() => getTableware())
+.catch(error => console.error('Unable to update tableware.', error));
     closeInput();
     return false;
 }
 function closeInput() {
-    document.getElementById('editForm').style.display = 'none';
+    document.getElementById('editTableware').style.display = 'none';
 }
-function _displayCategories(data) {
-    const tBody = document.getElementById('categories');
+function _displayTableware(data) {
+    const tBody = document.getElementById('tableware');
 
     tBody.innerHTML = '';
     const button = document.createElement('button');
-    data.forEach(category => {
+    data.forEach(tableware => {
         let editButton = button.cloneNode(false);
         editButton.innerText = 'Edit';
-    editButton.setAttribute('onclick', `displayEditForm(${category.id})`);
-    let deleteButton = button.cloneNode(false);
-    deleteButton.innerText = 'Delete';
-    deleteButton.setAttribute('onclick', `deleteCategory(${category.id})`);
-    let tr = tBody.insertRow();
-    let td1 = tr.insertCell(0);
-    let textNode = document.createTextNode(category.name);
-    td1.appendChild(textNode);
-    let td2 = tr.insertCell(1);
-    let textNodeInfo = document.createTextNode(category.desctiption);
-    td2.appendChild(textNodeInfo);
-    let td3 = tr.insertCell(2);
-    td3.appendChild(editButton);
-    let td4 = tr.insertCell(3);
-    td4.appendChild(deleteButton);
+        editButton.setAttribute('onclick', `displayEditForm(${tableware.tableware_id})`);
+        let deleteButton = button.cloneNode(false);
+        deleteButton.innerText = 'Delete';
+        deleteButton.setAttribute('onclick', `deleteCategory(${tableware.tableware_id})`);
+        let tr = tBody.insertRow();
+        let td1 = tr.insertCell(0);
+        let textNode = document.createTextNode(tableware.tableware_id);
+        td1.appendChild(textNode);
+        let td2 = tr.insertCell(1);
+        let manIdNode = document.createTextNode(tableware.manufacturer_id);
+        td2.appendChild(manIdNode);
+        let td3 = tr.insertCell(2);
+        let nameNode = document.createTextNode(tableware.name);
+        td3.appendChild(nameNode);
+        let td4 = tr.insertCell(3);
+        let typeNode = document.createTextNode(tableware.type_);
+        td4.appendChild(typeNode);
+        let td5 = tr.insertCell(4);
+        let materialNode = document.createTextNode(tableware.main_material);
+        td5.appendChild(materialNode);
+        let td6 = tr.insertCell(5);
+        let colourNode = document.createTextNode(tableware.main_colour);
+        td6.appendChild(colourNode);
+        let td7 = tr.insertCell(6);
+        td7.appendChild(editButton);
+        let td8 = tr.insertCell(7);
+        td8.appendChild(deleteButton);
 });
-    categories = data;
+    tablewares = data;
 }

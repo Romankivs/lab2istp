@@ -18,7 +18,11 @@ pub async fn tableware_new(
 ) -> Result<Json<TablewareEntity>> {
     use schema::tableware::dsl::*;
     let res: TablewareEntity = conn
-        .run(move |c| insert_into(tableware).values(new.into_inner()).get_result(c))
+        .run(move |c| {
+            insert_into(tableware)
+                .values(new.into_inner())
+                .get_result(c)
+        })
         .await?;
     Ok(Json(res))
 }

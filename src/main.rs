@@ -17,9 +17,9 @@ mod schema;
 use models::*;
 mod customer;
 mod manufacturer;
+mod sold_tableware;
 mod staff;
 mod tableware;
-mod sold_tableware;
 
 type Result<T, E = Debug<diesel::result::Error>> = std::result::Result<T, E>;
 
@@ -73,8 +73,8 @@ async fn update_staff(conn: LibraryDbConn, uid: i32) -> Result<Template> {
 }
 
 #[get("/")]
-async fn index(_conn: LibraryDbConn) -> Redirect {
-    Redirect::to(uri!("/car/list"))
+async fn index(_conn: LibraryDbConn) -> Result<Template> {
+    Ok(Template::render("index", {}))
 }
 
 #[get("/public/<file..>")]

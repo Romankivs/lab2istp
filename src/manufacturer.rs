@@ -18,7 +18,11 @@ pub async fn manufacturer_new(
 ) -> Result<Json<ManufacturerEntity>> {
     use schema::manufacturer::dsl::*;
     let res: ManufacturerEntity = conn
-        .run(move |c| insert_into(manufacturer).values(new.into_inner()).get_result(c))
+        .run(move |c| {
+            insert_into(manufacturer)
+                .values(new.into_inner())
+                .get_result(c)
+        })
         .await?;
     Ok(Json(res))
 }
@@ -40,14 +44,20 @@ pub async fn manufacturer_update(
 #[delete("/manufacturer/<uid>")]
 pub async fn manufacturer_delete(conn: LibraryDbConn, uid: i32) -> Result<Status> {
     use schema::manufacturer::dsl::*;
-    conn.run(move |c| delete(manufacturer).filter(manufacturer_id.eq(uid)).execute(c))
-        .await?;
+    conn.run(move |c| {
+        delete(manufacturer)
+            .filter(manufacturer_id.eq(uid))
+            .execute(c)
+    })
+    .await?;
     Ok(Status::Accepted)
 }
 
 #[get("/manufacturer/list")]
 pub async fn manufacturer_list(conn: LibraryDbConn) -> Result<Json<Vec<ManufacturerEntity>>> {
     use schema::manufacturer::dsl::*;
-    let all = conn.run(|c| manufacturer.load::<ManufacturerEntity>(c)).await?;
+    let all = conn
+        .run(|c| manufacturer.load::<ManufacturerEntity>(c))
+        .await?;
     Ok(Json(all))
 }

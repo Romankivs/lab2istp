@@ -12,10 +12,7 @@ pub async fn staff_get(conn: LibraryDbConn, uid: i32) -> Result<Json<StaffEntity
 }
 
 #[post("/staff", data = "<new>")]
-pub async fn staff_new(
-    conn: LibraryDbConn,
-    new: Json<Staff>,
-) -> Result<Json<StaffEntity>> {
+pub async fn staff_new(conn: LibraryDbConn, new: Json<Staff>) -> Result<Json<StaffEntity>> {
     use schema::staff::dsl::*;
     let res: StaffEntity = conn
         .run(move |c| insert_into(staff).values(new.into_inner()).get_result(c))
