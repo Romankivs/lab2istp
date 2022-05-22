@@ -1,5 +1,5 @@
 [global.databases]
-pg_library = { url = "postgres://postgres:summer@localhost/diesel_demo" }
+pg_library = { url = "postgres://postgres:summer@localhost/lab2db" }
 
 [default]
 secret_key = "zGfjrPuvZWANpuWITdxYSUWVIPqSJc/bkZcZN3AgfH8="

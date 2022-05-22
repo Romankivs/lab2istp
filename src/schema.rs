@@ -1,23 +1,4 @@
 table! {
-    car (plate_number) {
-        plate_number -> Varchar,
-        car_model_id -> Int4,
-        available -> Bool,
-        condition -> Text,
-        price_per_day -> Numeric,
-    }
-}
-
-table! {
-    car_model (car_model_id) {
-        car_model_id -> Int4,
-        model_name -> Text,
-        manufacturer_id -> Int4,
-        release_year -> Int4,
-    }
-}
-
-table! {
     country (country_id) {
         country_id -> Varchar,
         name -> Text,
@@ -25,13 +6,12 @@ table! {
 }
 
 table! {
-    customer (driver_license_id) {
-        driver_license_id -> Int4,
+    customer (customer_id) {
+        customer_id -> Int4,
         first_name -> Text,
         last_name -> Text,
-        birth_date -> Date,
         email -> Text,
-        phone_number -> Varchar,
+        phone_number -> Text,
     }
 }
 
@@ -45,15 +25,13 @@ table! {
 }
 
 table! {
-    rented_car (rented_car_id) {
-        rented_car_id -> Int4,
-        staff_id -> Int4,
-        plate_number -> Varchar,
+    sold_tableware (sold_tableware_id) {
+        sold_tableware_id -> Int4,
         customer_id -> Int4,
-        rent_date -> Date,
-        return_date -> Date,
-        returned -> Bool,
-        comment -> Text,
+        tableware_id -> Int4,
+        staff_id -> Int4,
+        date -> Date,
+        amount -> Int4,
     }
 }
 
@@ -63,23 +41,33 @@ table! {
         first_name -> Text,
         last_name -> Text,
         email -> Text,
-        password -> Text,
+        phone_number -> Text,
     }
 }
 
-joinable!(car -> car_model (car_model_id));
-joinable!(car_model -> manufacturer (manufacturer_id));
+table! {
+    tableware (tableware_id) {
+        tableware_id -> Int4,
+        manufacturer_id -> Int4,
+        name -> Text,
+        #[sql_name = "type"]
+        type_ -> Text,
+        main_material -> Text,
+        main_colour -> Text,
+    }
+}
+
 joinable!(manufacturer -> country (country_id));
-joinable!(rented_car -> car (plate_number));
-joinable!(rented_car -> customer (customer_id));
-joinable!(rented_car -> staff (staff_id));
+joinable!(sold_tableware -> customer (customer_id));
+joinable!(sold_tableware -> staff (staff_id));
+joinable!(sold_tableware -> tableware (tableware_id));
+joinable!(tableware -> manufacturer (manufacturer_id));
 
 allow_tables_to_appear_in_same_query!(
-    car,
-    car_model,
     country,
     customer,
     manufacturer,
-    rented_car,
+    sold_tableware,
     staff,
+    tableware,
 );
