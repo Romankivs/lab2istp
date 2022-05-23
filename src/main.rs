@@ -23,55 +23,6 @@ mod tableware;
 
 type Result<T, E = Debug<diesel::result::Error>> = std::result::Result<T, E>;
 
-#[get("/data/<uid>")]
-async fn data(conn: LibraryDbConn, uid: i32) -> Result<Template> {
-    use schema::staff::dsl::*;
-    let data: StaffEntity = conn
-        .run(move |c| staff.filter(staff_id.eq(uid)).first(c))
-        .await?;
-    Ok(Template::render("show", data))
-}
-
-#[post("/data", data = "<new_staff>")]
-async fn new_data(conn: LibraryDbConn, new_staff: Form<Staff>) -> Result<Redirect> {
-    use schema::staff::dsl::*;
-    conn.run(move |c| insert_into(staff).values(&*new_staff).execute(c))
-        .await?;
-    Ok(Redirect::to(uri!(index)))
-}
-
-#[put("/data/<uid>", data = "<updated_user>")]
-async fn update_data(conn: LibraryDbConn, uid: i32, updated_user: Form<Staff>) -> Result<Redirect> {
-    use schema::staff::dsl::*;
-    let target = update(staff).filter(staff_id.eq(uid));
-    conn.run(move |c| target.set(&*updated_user).execute(c))
-        .await?;
-    Ok(Redirect::to(uri!(index)))
-}
-
-#[delete("/data/<uid>")]
-async fn delete_data(conn: LibraryDbConn, uid: i32) -> Result<Redirect> {
-    use schema::staff::dsl::*;
-    conn.run(move |c| delete(staff).filter(staff_id.eq(uid)).execute(c))
-        .await?;
-
-    Ok(Redirect::to(uri!(index)))
-}
-
-#[get("/register")]
-fn add_staff() -> Template {
-    Template::render("add", HashMap::<i32, i32>::new())
-}
-
-#[get("/data/update/<uid>")]
-async fn update_staff(conn: LibraryDbConn, uid: i32) -> Result<Template> {
-    use schema::staff::dsl::*;
-    let data: StaffEntity = conn
-        .run(move |c| staff.filter(staff_id.eq(uid)).first(c))
-        .await?;
-    Ok(Template::render("update", data))
-}
-
 #[get("/")]
 async fn index(_conn: LibraryDbConn) -> Result<Template> {
     Ok(Template::render("index", {}))
@@ -92,12 +43,6 @@ fn rocket() -> _ {
             routes![
                 index,
                 public_file,
-                data,
-                new_data,
-                update_data,
-                delete_data,
-                add_staff,
-                update_staff,
                 tableware::tableware_list,
                 tableware::tableware_get,
                 tableware::tableware_new,
